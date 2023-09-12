@@ -1,0 +1,9 @@
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd"> 
+    <update handle="customer_account"/>
+    <body>
+        <referenceContainer name="content">
+            <block class="Aha\Organization\Block\Popup" name="validate_org" template="Aha_Organization::account/new_org.phtml"/>
+            <block class="Aha\Organization\Block\Account\Address" name="account_create_step" template="Aha_Organization::account/create.phtml" />
+        </referenceContainer>
+    </body>
+</page>

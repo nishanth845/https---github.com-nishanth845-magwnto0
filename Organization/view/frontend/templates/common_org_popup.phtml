@@ -1,0 +1,140 @@
+<?php 
+$this->customerSession->setCheckoutOrgPopup(1);
+$orgList = $block->getOrgList();
+//$customerOrgId = $block->getCustomerOrgId();
+$customerOrgId = $this->customerSession->getOrganization();
+$authAssociatedOrg = false;
+
+$adminListArray = array();
+
+if($orgList->getSize()){
+    foreach ($orgList as $admin){
+        if($admin->getIsAdmin() && $admin->getTcIdNumber()){
+            $adminListArray[] = $admin->getTcIdNumber();
+        }
+    }
+}
+?>
+<div class="modal-content" id="org-form">
+    <div class="aui-buyingfor-popup-close">
+        <button aria-label="close who are you ordering for today popup" class="close aha-modal-close float-right" data-dismiss="modal">
+         <span aria-hidden="true">×</span>
+        </button>
+    </div>
+    <div class="modal-header">
+        <h2 class="h4" id="organizationpopup-first-popup"><?= /* @noEscape */ __("Who are you ordering for today?") ?></h2>
+    </div>
+    <div role="radiogroup" aria-labelledby="contact-label" class="modal-body p-0 mt-2">
+        <p id="contact-label"><?= /* @noEscape */ __("If you do not see your Training Center or company below, you can select Myself or create a new organization account.") ?></p>
+        <form class="form cart-confirmation-org" method="post">
+            <div class="mt-4">
+                <div class="form-group form-radio">
+                    <input type="radio" name="organization" value="Myself" id="myself" class="custom-radio radio required-entry" <?= /* @noEscape */ ($customerOrgId == "Myself") ? 'checked' : '';?>>
+                    <label for="myself"><?= /* @noEscape */ __("None. I'm buying for myself.") ?></label>
+                </div>
+                <?php if($orgList->getSize()) {
+                    foreach ($orgList as $org) {
+                        if($org->getIsAdmin() || (!$org->getIsAdmin() && !in_array($org->getTcIdNumber(), $adminListArray))){
+                            $tcId = $org->getParentId();
+
+                            if($org->getIsAdmin()){ ?>
+                                <div class="form-group form-radio">
+                                    <input type="radio" name="organization" value="<?= /* @noEscape */ $tcId; ?>" id="org<?= /* @noEscape */ $tcId; ?>" <?= /* @noEscape */ ($org->getParentId() == $customerOrgId) ? 'checked' : '';?> class="custom-radio radio required-entry"> 
+                                    <label for="org<?= /* @noEscape */ $tcId; ?>"><?= $block->escapeHtml($org->getOrgName()) ?></label>
+                                </div>
+                            <?php } else{ ?>
+                                <div class="form-group form-radio non-tc">
+                                    <input type="radio" name="organization" value="<?= /* @noEscape */ $org->getTcIdNumber(); ?>" id="org<?= /* @noEscape */ $tcId; ?>" class="custom-radio radio required-entry"> 
+                                    <label for="org<?= /* @noEscape */ $tcId; ?>"><?= $block->escapeHtml($org->getOrgName()) .' (Training Center ID: '.$org->getTcIdNumber().')' ?></label>
+                                </div>
+                            <?php }
+                        }
+                    }
+                }?>
+                <div class="form-group form-radio">
+                    <input type="radio" name="organization" value="setup" id="setup" class="custom-radio radio required-entry setup"> 
+                    <label for="setup"><?= /* @noEscape */ __("Create New Organization") ?></label>
+                </div>
+            </div>
+        </form> 
+    </div>
+    <div class="modal-footer position-relative">
+        <button aria-label="continue to checkout" class="btn btn-primary btn-round submit orgproceed " disabled="disabled"><?= /* @noEscape */ __("Continue") ?></button>
+        <span class="shop-conf-loader spinner-border spinner-border-sm position-absolute" style="display:none"></span>
+        <!--<button class="btn btn-primary btn-round non-tc-submit orgproceed"><?= /* @noEscape */  __("Continue") ?></button>-->
+    </div>
+</div>
+<script type="text/javascript">
+require([
+  'jquery',
+  'mage/mage'
+], function($){
+    $(".mage-error").hide();
+    $("#org-form button.non-tc-submit").hide();
+    $("#org-form button.submit").click(function(){
+        if ($("input[name='organization']:checked").length > 0){
+            $(".mage-error").hide();
+            var id = $("input[name='organization']:checked").val();
+            if(id == "setup"){
+                //steps(1);
+                newOrgPopup();
+            } else {
+                $("#orgpopup .shop-conf-loader").show();
+                changeOrg(id);
+            }
+        } else{
+            $(".mage-error").show();
+        }
+        return false;
+    });
+    
+    //radio button click function
+    $("#org-form .form-radio input").click(function(){
+        $(".mage-error").hide();
+
+        if($(this).parent().hasClass( "non-tc" )){
+            $("#org-form button.non-tc-submit").show();
+            $("#org-form button.submit").hide();
+        } else {
+            $("#org-form button.submit").show();
+            $("#org-form button.non-tc-submit").hide();
+        }
+        /*org select radio add arialabel*/
+        if ($("input[name='organization']:checked").length > 0){
+            var id = $("input[name='organization']:checked").val();
+            if(id == "setup"){
+                $('.orgproceed').attr('aria-label','continue to create new organization');
+            } else {
+                $('.orgproceed').attr('aria-label','continue to checkout');
+            }
+        }
+        /*org select radio add arialabel*/
+    });
+    //validate TC
+    $("#org-form button.non-tc-submit").click(function(){
+        if ($("input[name='organization']:checked").length > 0){
+            var id = $("input[name='organization']:checked").val();
+            validateTC(id);
+        }
+    });
+    
+    //Close popup action
+    $("#org-form .close").click(function(){
+        var url = MAGE_URL + 'organization/popup/resetsession';
+        $.ajax({
+            url: url,
+            type: 'POST',
+            dataType: "json",
+            showLoader: false
+        });
+        $("#orgpopup").hide();
+        $('body').removeClass('modal-open');
+    });
+    setPopupSession("commonOrgPopup()");
+    //Enable the OrgProceed Button 
+    setTimeout(function(){
+        $("button.orgproceed").removeAttr("disabled");
+        $("input[name='organization']:checked").focus();
+    }, 500);
+});
+</script>

@@ -1,0 +1,58 @@
+<?php $_order = $block->getOrder(); ?>
+<?php if(!empty($_order->getOrgId()) || !empty($_order->getPoNumber())){ ?>
+    <section class="admin__page-section order-view-org-info">
+        <div class="admin__page-section-title">
+            <span class="title"><?= /* @escapeNotVerified */ __('Additional Information') ?></span>
+        </div>
+        <div class="admin__page-section-content">
+            <div class="admin__page-section-item order-payment-method<?php if ($_order->getIsVirtual()): ?> order-payment-method-virtual<?php endif; ?>">
+                <?php /* Payment Method */ ?>
+                <!--<div class="admin__page-section-item-title">
+                    <span class="title"><?= /* @escapeNotVerified */ __('Org Information') ?></span>
+                </div> -->
+                <div class="admin__page-section-item-content">
+                    <?php $orgData = $this->getOrgData($_order->getOrgId());
+                    if($orgData->hasData()){ ?>
+                        <div class="order-org-title"><?= $orgData->getOrgName() . ' (' .$orgData->getMorgId() .')' ?></div>
+                        <div class="order-org-additional">
+                            <?php if(!empty($_order->getPurchaseCode())){?>
+                                <div>
+                                    <label><?= __('Purchase Code : ')?></label>
+                                    <span><?= $_order->getPurchaseCode() ?></span>
+                                </div>
+                            <?php } ?>
+                            <?php if(!empty($_order->getSecurityId())){?>
+                                <div>
+                                    <label><?= __('Security Id : ')?></label>
+                                    <span><?= $_order->getSecurityId() ?></span>
+                                </div>
+                            <?php } ?>
+                            <?php if(!empty($_order->getItcCode())){?>
+                                <div>
+                                    <label><?= __('ITC Code: ')?></label>
+                                    <span><?= $_order->getItcCode() ?></span>
+                                </div>
+                            <?php } ?>
+                            <?= $block->getChildHtml('payment_additional_info') ?>
+                        </div>
+                    <?php }
+                    if(!empty($_order->getPoNumber())){ ?>
+                        <div class="order-org-additional">
+                            <div>
+                                <label><?= __('PO#/Required AP Info : ')?></label>
+                                <span><?= $escaper->escapeHtml($_order->getPoNumber()) ?></span>
+                            </div>
+                        </div>
+                    <?php } ?>
+                    <?php if (!empty($_order->getTaxNumber())):?>
+                        <div>
+                            <label><?= __('Tax ID or VAT number: ')?></label>
+                            <span><?= $_order->getTaxNumber() ?></span>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <?= $block->getChildHtml('order_shipping_view') ?>
+        </div>
+    </section>
+<?php } ?>

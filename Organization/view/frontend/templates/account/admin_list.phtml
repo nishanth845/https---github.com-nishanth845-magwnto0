@@ -1,0 +1,67 @@
+<?php
+/**
+ * @category  AHA
+ * @package   Organization
+ * @author    alexander.rajan@laerdal.com
+ **/
+?>
+<?php 
+$orgId = $this->customerSession->getOrganization();
+$adminList = $block->getAdminList();
+$orgAdminReq = $block->getOrgAdminReq();
+?>
+<div class="block block-admin-list">
+    <div class="block-title">
+        <strong><?= $block->escapeHtml(__('Admin List')) ?></strong>
+    </div>
+    <div class="block-content">
+        <div class="admin-list">
+            <p class="stop-one-des">Please contact the below admin's and get it approved.</p>
+            <ul>
+                <?php foreach($adminList as $admin) {?>
+                <li>
+                    <span class="name" ><?= $admin->getFirstname() . ' '.$admin->getLastname() ?></span>
+                    <span class="email" ><?= $admin->getEmail() ?></span>
+                </li>
+                <?php } if($orgAdminReq->getSize()) {?>
+                <?php foreach($orgAdminReq as $orgAdmin) {?>
+                <li>
+                    <span class="name"><?= $orgAdmin->getUName()?></span>
+                    <span class="email"><?= $orgAdmin->getEmail() ?></span>
+                </li>
+                <?php } } ?>
+            </ul>
+        </div>
+        <div class="new-org-main-btn-wrap"> 
+            
+            <div id="" class="actions">
+                <button type="button" class="back action submit primary1 back-btn-left" id="" title="cancel">
+                    <span><?php echo __('Back'); ?></span>
+                </button>
+                <?php if(!empty($this->customerSession->getOrganization())){ ?>
+                    <a class="continue btn-continue" href="javascript:void(0)"><?= __("Continue") ?></a>
+                <?php } else { ?>
+                    <a class="mysqlf btn-continue" href="javascript:void(0)"><?= __("Confinue") ?></a>
+                <?php } ?>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    require([
+        'jquery'
+    ], function ($) {
+        $(".block-admin-list .back").click(function(){
+            back();
+        });
+        
+        $(".block-admin-list .continue").click(function(){
+            changeOrg("<?= $orgId ?>");
+        });
+        
+        $(".block-admin-list .mysqlf").click(function(){
+            changeOrg("Myself");
+        });
+        
+    });
+</script>

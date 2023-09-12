@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Filename     : organization_customer_organization.xml
+ * Developer    : Alexander
+ * Company      : AHA
+ * Module       : Aha_Organization
+-->
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/layout_generic.xsd">
+    <container name="root" label="Root">
+        <block class="Aha\Organization\Block\Adminhtml\Organization\Edit\Tab\OrganizationGrid" name="customer.edit.tab.organization"/>
+        <block class="Magento\Backend\Block\Widget\Grid\Serializer" name="organization_grid_serializer" template="Aha_Organization::widget/grid/customerserializer.phtml">
+            <arguments>
+                <argument name="grid_block" xsi:type="string">customer.edit.tab.organization</argument>
+                <argument name="callback" xsi:type="string">getSelectedOrganization</argument>
+                <argument name="input_element_name" xsi:type="string">organization</argument>
+                <argument name="reload_param_name" xsi:type="string">index_organizarion</argument>
+            </arguments>
+        </block>
+    </container>
+</layout>

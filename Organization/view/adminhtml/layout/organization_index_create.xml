@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!--
+ * Filename     : organization_index_create.xml
+ * Developer    : Alexander
+ * Company      : AHA
+ * Module       : Aha_Organization
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="organization_index_edit"/>
+    <body/>
+</page>

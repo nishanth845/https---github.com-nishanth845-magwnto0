@@ -1,0 +1,147 @@
+<?php
+/**
+ * @category  AHA
+ * @package   Organization
+ * @author    alexander.rajan@laerdal.com
+ **/
+
+/** @var \Magento\Framework\Escaper $escaper */
+?>
+<?php $orgData = $block->getOrgData();
+$orgTempData = $this->customerSession->getOrgData();
+$companyName = $this->customerSession->getOrgName();
+$legalName = !empty($companyName) ? $this->customerSession->getLegalName() : '';
+//$tax_excempt_email = $this->getConfig('organization/org_setting/tax_exempt_email');
+$specificMsg = $this->getConfig('organization/org_setting/specificmsg');
+
+if($orgData){
+    $data = $orgTempData;
+    $data['tc-id'] = $orgData->getId();
+    $data['tc_id'] = $orgData->getTcId();
+    $data['tc_id_number'] = $orgData->getTcIdNumber();
+    $data['store_id'] = $orgData->getStoreId();
+    $data['website_id'] = $orgData->getWebsiteId();
+
+    if(!isset($orgTempData['org_name']) && $this->isInitPopupRequired()){
+        $data['org_name'] = $orgData->getOrgName();
+        $data['tax_exemption'] = $orgData->getTaxExemption();
+        $data['tax_number'] = $orgData->getTaxNumber();
+    }
+    $data['security_id'] = $orgData->getSecurityId();
+    $data['itc_code'] = $orgData->getItcCode();
+    $this->customerSession->setOrgData($data);
+    $orgTempData = $this->customerSession->getOrgData();
+}
+?>
+<div class="modal-content block-step-one">
+    <div class="modal-header m-0">
+        <h2 class="h4" id="organizationpopup-first-popup"><?= $block->escapeHtml(__('Organization Details')) ?></h2>
+    </div>
+    <div class="modal-body p-0 mt-lg-2">
+        <form class="form-org-one mt-3"
+              data-mage-init='{"validation":{}}'
+              method="post"
+              id="form-org-one"
+              enctype="multipart/form-data"
+              data-hasrequired="<?= $block->escapeHtmlAttr(__('* Required Fields')) ?>">
+            <div class="form-group row required">
+                <label class="col-md-5 col-lg-4 col-form-label" for="org_name"><?= $escaper->escapeHtml(__("Company Name")) ?></label>
+                <div class="col-md-7 col-lg-8">
+                    <input type="text" name="org_name"
+                           value="<?= $escaper->escapeHtml((isset($orgTempData['org_name'])) ? $orgTempData['org_name'] : $companyName )?>" 
+                           class="form-control input-text required-entry validate-no-html-tags" id="org_name" autocomplete="on"/>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-md-5 col-lg-4 col-form-label"for="tax_number"><?= $escaper->escapeHtml(__("Tax ID or VAT number")) ?></label>
+                <div class="col-md-7 col-lg-8">
+                    <input type="text" class="form-control input-text validate-no-html-tags" id="tax_number" name="tax_number" value="<?= $escaper->escapeHtml((isset($orgTempData['tax_number'])) ? $orgTempData['tax_number'] : '') ?>" autocomplete="on" maxlength="25"/>
+                    <p id="tax_number_error" class="font14 aui-lt-red mt-2 mb-md-0 d-none">Enter valid Tax ID or VAT number.</p>
+                    <p aria-hidden="true" class="mb-0 scpr-grey font14 mt-2">Note: Max 25 alphanumeric characters are allowed including (-,.,/)</p>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="tax_exemption_applied" class="col-md-5 col-lg-4 col-form-label"><?= $escaper->escapeHtml(__("Tax Exempt Status")) ?></label>
+                <div class="col-md-7 col-lg-8">
+                    <select name="tax_exemption_applied" class="form-control" id="tax_exemption_applied">
+                        <option value="0"><?= $escaper->escapeHtml(__("No")) ?></option>
+                        <option value="1"  <?= $escaper->escapeHtml((isset($orgTempData['tax_exemption_applied']) && $orgTempData['tax_exemption_applied']) ? 'selected' : '') ?>><?= $escaper->escapeHtml(__("Yes")) ?></option>
+                    </select>
+                </div>
+                <div role="alert" id="tax_exempt_note" class="pl-0"></div>
+            </div>
+            <input type="hidden" name="suborg" value="<?= $escaper->escapeHtml(($orgData) ? $block->getIsSubOrg() : '') ?>">
+        </form>
+    </div>
+    <div class="modal-footer mt-2 mb-3">
+        <div class="w-100">
+            <div class="d-flex justify-content-end tc-detail">
+                <a id="tcd-back" role="button" aria-label="Back to the previous screen" href="javascript:void(0);" class="back btn btn-secondary btn-round mr-4"><?= $escaper->escapeHtml(__("Back")) ?></a>
+                <a id="tcd-next" role="button" aria-label="next to Proceed" href="javascript:void(0);" class="next btn btn-primary btn-round action"><?= $escaper->escapeHtml(__("Next")) ?></a>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    require([
+        'jquery',
+        'mage/mage'
+    ], function($){
+        var dataForm = $('#form-org-one');
+        dataForm.mage('validation', {});
+        $(".block-step-one .next").click(function(){
+            var status = dataForm.validation('isValid');
+            var tax_number = $('#tax_number').val();
+            var tax_number_length = tax_number ? tax_number.length : 0;
+            if (tax_number_length != 0) {
+                var regexp = /^[a-zA-Z0-9-./]+$/;
+                if (tax_number.search(regexp) === -1) {
+                    $('#tax_number_error').removeClass('d-none');
+                    $('#tax_number_error').show();
+                    $('#tax_number').focus();
+                    return false;
+                } else {
+                    $('#tax_number_error').hide();
+                }
+            }
+            if(status){
+                $.ajax({
+                    type : 'POST',
+                    url : '<?= $escaper->escapeUrl($this->geturl("organization/popup/serialize"))?>',
+                    data : jQuery('#form-org-one').serialize(),
+                    success: function(response){
+                        steps(2);
+                    }
+                });
+                // setting popup session for back button
+                setPopupSession("steps(1)");
+            }
+        });
+
+        $("#tax_exemption_applied").change(function(){
+            $("#tax_exemption_applied").find("option:selected").each(function(){
+                var optionValue = $(this).attr("value");
+                if(optionValue == 1){
+                    var specificMsg = "<?= /* @noEscape */ $specificMsg?>";
+                    $("#tax_exempt_note").addClass('tax_exempt_note');
+                    $("#tax_exempt_note").html(specificMsg);
+
+                    // NOTE:- Commented because alert message is reading twise
+                    //$("#tax_exempt_note").attr('aria-label', specificMsg);
+                }else{
+                    $("#tax_exempt_note").html('');
+                    $("#tax_exempt_note").removeClass('tax_exempt_note');
+                }
+
+            });
+
+        }).trigger( "change" );
+
+
+
+        $(".block-step-one .back").click(function(){
+            back();
+        });
+
+    });
+</script>

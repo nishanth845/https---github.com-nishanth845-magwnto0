@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Filename     : di.xml
+ * Developer    : Alexander
+ * Company      : AHA
+ * Module       : aha_Organization
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <virtualType name="Aha\Organization\Model\ResourceModel\Organization\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">aha_organization</argument>
+            <argument name="resourceModel" xsi:type="string">Aha\Organization\Model\ResourceModel\Organization</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="aha_organization_grid_data_source" xsi:type="string">Aha\Organization\Model\ResourceModel\Organization\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Aha\Organization\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+    <type name="Aha\Organization\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">account-setup</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="system" xsi:type="object">Aha\Organization\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </type>
+    <!-- GRID TABLES HANDLING -->
+    <virtualType name="Magento\Sales\Model\ResourceModel\Order\Grid">
+        <arguments>
+            <argument name="columns" xsi:type="array">
+                <item name="org_id" xsi:type="string">sales_order.org_id</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <preference for="Magento\Quote\Model\QuoteManagement" type="Aha\Organization\Model\QuoteManagement" />
+    <preference for="Magento\Quote\Model\QuoteAddressValidator" type="Aha\Organization\Model\QuoteAddressValidator" />
+    <preference for="Magento\Ui\Component\Layout\Tabs" type="Aha\Organization\Component\Layout\Tabs" />
+    <preference for="Aha\Organization\Api\TncAcceptanceRepositoryInterface" type="Aha\Organization\Model\TncAcceptanceRepository"/>
+    <preference for="Aha\Organization\Api\Data\TncAcceptanceInterface" type="Aha\Organization\Model\TncAcceptance"/>
+    <preference for="Aha\Organization\Api\Data\TncAcceptanceSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+</config>

@@ -1,0 +1,154 @@
+<div class="header-separotor"></div>
+<?php
+$orgList = $block->getOrgList();
+
+//$orgList->getSelect()->where('main_table.is_admin = 1');
+$selectedvalue = $this->customerSession->getOrganization();
+
+if($orgList->getSize()) {
+    /*
+     * Added to Redirection in Customer New address add/Edit functionality to redirect to address dashboard
+     */          
+    $controllerName = $this->getRequest()->getControllerName();
+    $moduleName = $this->getRequest()->getModuleName(); 
+?>
+<div class="header-divider"></div>
+<div class="field buyingFor mobilebuyingFor">
+    <div class="buy-innercontainer">
+        <label class="label buying-for" for="buy_for">
+            <span><?= /* @noEscape */ _('I am buying for') ?></span>
+        </label>
+        <div class="control buyingForDropDown" id="buy_for_container">
+            <span class="orgdown-arow"></span>
+            <input type="text" id="mobile-show-active" aria-haspopup="listbox" value="" readonly="" aria-labelledby="buy_for_exp" autocomplete="off">
+                <ul id="mobile_buy_for" name="mobile_buy_for"
+                    title="<?= /* @noEscape */_('Shop For') ?>" style="display:none;">
+                 <li data-value="Myself" id="Myself" class="<?= /* @noEscape */ ($selectedvalue) == 'Myself' ? 'selected' : '' ?>" role="option"><span class="sub-org-name"><?= /* @noEscape */ __("Myself") ?></span></li>
+                    <?php foreach ($orgList as $value){
+                        $tcId = $value->getTcIdNumber();
+                        if($value->getParentId() == $selectedvalue) {$selected = "selected";} else { $selected = '';}
+                        ?>
+                        <li data-value="<?= /* @noEscape */ $value->getParentId() ?>" id="<?= /* @noEscape */ $value->getParentId() ?>" class="<?= /* @noEscape */ $selected ?>" role="option">
+                            <?php if($value->getParentName()) {?>
+                                <span class="parent-org-name"><?= $block->escapeHtml($value->getParentName()) ?></span>
+                            <?php } ?>
+                            <span class="sub-org-name"><?= $block->escapeHtml($value->getOrgName())?></span>
+                        </li>
+                <?php } ?>
+                <span class="no-result-li">No Results Found</span>
+                </ul>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+require([
+  'jquery',
+  'mage/mage'
+], function($){
+    $(document).ready(function(e){
+        $("#mobile_buy_for li").each(function() {
+            if($(this).hasClass("selected")){
+                var text = safe_tags($(this).find('.sub-org-name').html());
+                var data = trimData(text, 8);    
+                $("#mobile-show-active").html(data);
+                $("#mobile-show-active").attr("value", text);
+                $("#mobile-show-active").attr("title", text);
+            }
+        });
+    });
+    
+    $("#mobile_buy_for").on("click", "li:not(.init)", function() {
+        if ($(this).hasClass("selected")) {
+            $("#mobile_buy_for").hide();
+        } else {
+            $("#mobile_buy_for li").removeClass('selected');
+            $(this).addClass('selected');
+            var text = safe_tags($(this).html());
+            var data = trimData(text, 8);    
+            $("#mobile-show-active").html(data);
+            $("#mobile_buy_for").show();
+            var option = $(this).attr("data-value");
+            if(option !== ''){
+                var url = MAGE_URL + 'organization/popup/resetsession';
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    dataType: "json",
+                    showLoader: false
+                });
+                changeOrg(option);
+            }
+        }
+    });
+    function trimData(data, size){
+        var text = data.split('');
+        if(text.length > size){
+            while(text.length > size ){
+                    text.pop();
+            }
+            text.push("...");
+        }
+        return (text.join(""));
+    }
+    /*input three dots js start*/
+    $('#mobile-show-active').on('click', function() {
+        $("#mobile_buy_for li").show();
+        $('#mobile_buy_for').removeClass('no-results');
+        $(this).val('');
+        $(this).prop('readonly', '');
+        $("#mobile_buy_for").show();
+        $(this).focus();
+        $('#mobile_buy_for li.selected').focus();
+        var text = $("#mobile_buy_for li.selected .sub-org-name").text();
+        $(this).attr("placeholder", text);
+    });
+    $(document).on('click', '.mobilebuyingFor .orgdown-arow', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        $("#mobile-show-active").trigger("click");
+    });
+    $('#mobile-show-active').on('blur', function() {
+        $(this).prop('readonly', 'readonly');
+        $(this).val('');
+        $("#mobile_buy_for li").each(function() {
+            var text = safe_tags($(this).find('.sub-org-name').text());
+            $(this).find('.sub-org-name').html(text);
+            if($(this).hasClass("selected")){
+                $("#mobile-show-active").attr("value", text);
+                $("#mobile-show-active").attr("placeholder", "");
+            }
+        });
+    });
+    $('#mobile-show-active').on('keyup', function() {
+        var input, filter, ul, li, span, i, txtValue;
+        input = document.getElementById("mobile-show-active");
+        filter = input.value.toUpperCase();
+        ul = document.getElementById("mobile_buy_for");
+        li = ul.getElementsByTagName("li");
+        for (i = 0; i < li.length; i++) {
+            span = li[i].getElementsByClassName("sub-org-name")[0];
+            txtValue = span.textContent || span.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                li[i].style.display = "";
+                let txt = String(txtValue).replace(new RegExp(filter, "gi"),"<b>$&</b>");
+                span.innerHTML = txt;
+            } else {
+                li[i].style.display = "none";
+            }
+        }
+        var noResultFlagm = true;
+        jQuery("#mobile_buy_for li").each(function() {
+            if(jQuery(this).is(':visible')){
+                noResultFlagm = false;
+            }
+        });
+        if(noResultFlagm == true) {
+            jQuery('#mobile_buy_for').addClass('no-results');
+        }else {
+            jQuery('#mobile_buy_for').removeClass('no-results');
+        }
+    });
+});
+</script>
+<?php } ?>

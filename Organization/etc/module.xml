@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Filename     : module.xml
+ * Developer    : Alexander
+ * Company      : AHA
+ * Module       : Aha_Organization
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="../../../../../lib/internal/Magento/Framework/Module/etc/module.xsd">
+    <module name="Aha_Organization" setup_version="1.2.1">
+        <sequence>
+            <module name="Punchout_Gateway"/>
+            <module name="Aha_InternationalTelephoneInput"/>
+        </sequence>
+    </module>
+</config>

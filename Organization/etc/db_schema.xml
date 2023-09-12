@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="aha_tnc_acceptance">
+        <column name="entity_id" comment="Entity Id" identity="true" nullable="false" unsigned="true" xsi:type="int"/>
+        <column name="customer_id" nullable="false" xsi:type="int" comment="Customer Id, if org accepted customer id will be captured"/>
+        <column name="org_id" nullable="true" xsi:type="int" comment="Organization Id"/>
+        <column name="website_id" nullable="true" unsigned="true" xsi:type="smallint" comment="Website Id"/>
+        <column name="group_id" nullable="true" unsigned="true" xsi:type="smallint" comment="Store Group Id" default="0"/>
+        <column name="store_id" nullable="true" unsigned="true" xsi:type="smallint" comment="Store View Id" default="0"/>
+        <column name="created_at" nullable="false" on_update="false" default="CURRENT_TIMESTAMP" xsi:type="timestamp" comment="Created At" />
+        <column name="updated_at" nullable="false" on_update="true" default="CURRENT_TIMESTAMP" xsi:type="timestamp" comment="Updated At"/>
+        <constraint referenceId="PRIMARY" xsi:type="primary">
+            <column name="entity_id"/>
+        </constraint>
+        <index referenceId="AHA_TNC_ACCEPTANCE_CUSTOMER_ID" indexType="btree">
+            <column name="customer_id"/>
+        </index>
+        <index referenceId="AHA_TNC_ACCEPTANCE_ORG_ID" indexType="btree">
+            <column name="org_id"/>
+        </index>
+        <index referenceId="AHA_TNC_ACCEPTANCE_WEBSITE_ID" indexType="btree">
+            <column name="website_id"/>
+        </index>
+        <index referenceId="AHA_TNC_ACCEPTANCE_GROUP_ID" indexType="btree">
+            <column name="group_id"/>
+        </index>
+        <index referenceId="AHA_TNC_ACCEPTANCE_STORE_ID" indexType="btree">
+            <column name="store_id"/>
+        </index>
+    </table>
+    <table name="aha_newsletter_subscriber">
+        <column name="subscriber_website_id" nullable="true" unsigned="true" xsi:type="smallint" comment="Website Id"/>
+        <column name="group_id" nullable="true" unsigned="true" xsi:type="smallint" comment="Store Group Id" default="0"/>
+        <index referenceId="AHA_NEWSLETTER_SUBSCRIBER_WEBSITE_ID" indexType="btree">
+            <column name="subscriber_website_id"/>
+        </index>
+        <index referenceId="AHA_NEWSLETTER_SUBSCRIBER_GROUP_ID" indexType="btree">
+            <column name="group_id"/>
+        </index>
+        <constraint xsi:type="foreign" referenceId="AHA_NEWS_SUBSCRIBER_WEBSITE_ID" table="aha_newsletter_subscriber" column="subscriber_website_id" referenceTable="store_website" referenceColumn="website_id" onDelete="SET NULL"/>
+        <constraint xsi:type="foreign" referenceId="AHA_NEWS_SUBSCRIBER_GROUP_ID" table="aha_newsletter_subscriber" column="group_id" referenceTable="store_group" referenceColumn="group_id" onDelete="SET NULL"/>
+    </table>
+</schema>

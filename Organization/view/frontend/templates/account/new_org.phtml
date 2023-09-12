@@ -1,0 +1,124 @@
+<?php
+/**
+ * @category  AHA
+ * @package   Organization
+ * @author    alexander.rajan@laerdal.com
+ **/
+?>
+<?php
+$orgTempData = $this->customerSession->getOrgData();
+$orgListAdmin = $block->getOrgList();
+$adminListArray = array();
+
+if($orgListAdmin->getSize()){
+    foreach ($orgListAdmin as $admin){
+        if($admin->getIsAdmin() && $admin->getTcIdNumber()){
+            $adminListArray[] = $admin->getTcIdNumber();
+        }
+    }
+}
+?>
+<div class="modal-content block-organization-create">
+    <div class="modal-header m-0">
+        <h2 class="h4" id="organizationpopup-first-popup">Training Center ID</h2>
+    </div>
+    <div class="modal-body p-0 mt-4">
+        <p><?= $block->escapeHtml(__("If you are a Training Center, enter or confirm your AHA Training enter ID number. If you are not a Training Center, select I don’t have a TC ID Number.")) ?></p>
+        <form>
+            <div class="form-group row required">
+                <label for="tc_id" class="col-lg-4 col-form-label"><?= $block->escapeHtml(__("Training Center ID Number")) ?></label>
+                <div class="col-lg-8 associate-account">
+                    <input name="tc_id_number" aria-label="training center id" type="text" class="form-control tc_id tid required-entry" id="tc_id" autocomplete="on" autofocus/>
+                    <?php 
+                    $dropdownFlag = false;
+                    $i = 1;
+                    foreach ($orgListAdmin as $org) {
+                        if(!$org->getIsAdmin() && !in_array($org->getTcIdNumber(), $adminListArray)){
+                            $dropdownFlag = true;
+                            if($i == 1) { ?>
+                                <select name="tc_id_option" class="tc_id_option">
+                                <option value=""><?= /* @noEscape */ __("Choose a TCID") ?></option>
+                            <?php }
+                            echo '<option value="'.$org->getTcIdNumber().'" > '.$block->escapeHtml($org->getOrgName()).'</option>';
+                            $i++;
+                        }
+                    } ?>
+                    <?php if($dropdownFlag) { ?>
+                            <option class="entera-new-tcid" value="newcode">(Enter a new TC ID)</option>
+                        </select>
+                    <?php } ?>
+                    <div for="tc_id" generated="true" class="mage-error" id="tc_id-error" style="display: none"><?= /* @noEscape */ __("This is a required field.")?></div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer mt-3 mb-4">
+        <div class="w-100">
+            <div class="d-flex justify-content-end mb-4 tc-id">
+                <a role="button" id="tc-id-cancel" href="javascript:void(0);" class="btn btn-secondary btn-round mr-4 back"><?= $block->escapeHtml(__("Back")) ?></a>
+                <a id="tc-id-next" role="button" aria-label="Next to Proceed" href="javascript:void(0);" class="btn btn-primary btn-round action next"><?= $block->escapeHtml(__("Next")) ?></a>
+            </div>
+            <div class="d-flex flex-row-reverse no-tc">
+                <a id="tc-id-donthave" role="button" href="#" aria-label="<?= $block->escapeHtml(__("I don't have a TC ID Number")) ?> proceed to next screen" class="font-red"><?= $block->escapeHtml(__("I don't have a TC ID Number")) ?> <i class="aha-icon-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    require([
+        'jquery'
+    ], function ($) {
+        var url = '<?= $block->escapeUrl($block->getValidateTCUrl()); ?>';
+        $(".block-organization-create .action").click(function(){
+            if($(".tc_id").val().length){
+                var id = $(".tc_id").val();
+                $(".mage-error").hide();
+                validateTC(id);
+            } else {
+                $("#tc_id").attr({"aria-invalid":true, "aria-describedby":"tc_id-error"});
+                $(".mage-error").html("This is a required field.");
+                $("#tc_id").focus();
+                $(".mage-error").show();
+            }
+        });
+
+        $(".associate-account a").click(function(){
+            var id = $(this).attr('tc_id');
+            validateTC(id);
+        });
+        
+        $(".tc_id_option").on("change",function(){
+            $(".mage-error").hide();
+            $('option:selected',this);
+            var code= $(this).val();
+            // $(this).val("");
+            if($.trim(code) == "") {
+                //$(".tid").val("").hide();
+                $(".tid").show().val("");
+            } else if($.trim(code) == "newcode") {
+                $(".tid").show().val("");
+            } else {
+                $(".tid").show().val(code);
+            }
+        });
+        
+        $(".block-organization-create .back").click(function(){
+           //window.location.reload();
+           back();
+        });
+        
+        $(".block-organization-create .no-tc a").click(function(){
+            setPopupSession("newOrgPopup()");
+            unsetOrgData();
+            steps(1);
+        });
+        
+        //create temp local storage to trace this page landing
+        localStorage.setItem("newOrgPop", true);
+        
+        var retrievedData = JSON.parse(localStorage.getItem("popupSession"));
+        if(retrievedData === null || retrievedData.length == 0){
+            $(".block-organization-create a.back").html("Cancel");
+        }
+});
+</script>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Filename     : customer_index_edit.xml
+ * Developer    : Alexander
+ * Company      : AHA
+ * Module       : Aha_Organization
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="customer_form">
+            <block class="Aha\Organization\Block\Adminhtml\OrganizationTabs" name="organization_edit_tab_view" >
+                <action method="setTabLabel">
+                    <argument name="label" xsi:type="string">Organization</argument>
+                </action>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

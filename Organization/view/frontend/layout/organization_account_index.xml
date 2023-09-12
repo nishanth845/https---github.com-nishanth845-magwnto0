@@ -1,0 +1,12 @@
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd"> 
+    <update handle="customer_account"/>
+    <head>
+        <css src="Aha_InternationalTelephoneInput::css/intlTelInput.css"/>
+        <link src="Aha_InternationalTelephoneInput::js/utils.js"/>
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block class="Aha\Organization\Block\Account\Organization" name="my_organization"  cacheable="true" template="Aha_Organization::account/organization.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

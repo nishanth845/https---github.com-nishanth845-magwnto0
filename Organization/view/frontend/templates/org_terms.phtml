@@ -1,0 +1,144 @@
+<?php 
+$orgData = $this->customerSession->getOrgData();
+$terms = $block->getTerms();
+$termsUrl = $this->getConfig('organization/org_setting/tnc_url');
+$policyUrl = $this->getConfig('organization/org_setting/policy_url');
+$proceedFlag = false;
+$isPunchoutLogin = $block->getIsPunchoutLogin();
+$communicationText = "Send me communications about AHA training and products for CPR and first aid.";
+
+if( $this->storeManager->getWebsite()->getCode() == \Aha\StoreSwitcher\Helper\Data::INSIGHTS_WEBSITE_CODE) {
+    $communicationText = "Send me communications about AHA training.";
+}
+?>
+<div class="modal-content block block-terms-popup">
+    <div class="modal-header m-0 pb-2 pb-md-3">
+        <h2 class="h4" id="organizationpopup-first-popup"><?= $block->escapeHtml(__('Terms and Conditions')) ?></h2>
+    </div>
+    <div class="modal-body p-0 mt-2 mt-md-3">
+        <form class="terms-form" id="terms-form" method="post" action="<?= $escaper->escapeUrl($this->getUrl('organization/account/saveterms'))?>">
+            <div>
+                <div class="field">
+                    <?php if ($terms['terms']): $proceedFlag = true;?>
+                        <div class="control" role="group" aria-labelledby="term-condition-label">
+                            <p id="term-condition-label" class="label radio-inline">
+                                A new organization account has been created for <?= $escaper->escapeHtml(strip_tags($orgData['org_name'])) ?>, Please accept the <a class="aui-red aui-textdec-line" href="<?= /* @noEscape */ $termsUrl ?>" target="_blank" class="link-red aui-textdec-line">Terms & Conditions</a>
+                                    and the <a class="aui-red aui-textdec-line" href="<?= /* @noEscape */ $policyUrl ?>" target="_blank" class="link-red">Privacy Policy</a> to use the site on behalf of <?= $escaper->escapeHtml(strip_tags($orgData['org_name'])) ?>.
+                            </p>
+                            <div class="field form-group form-radio">
+                                <input type="radio" name="terms" id="tnc1" value="1" class="custom-radio radio required-entry">
+                                <label class="label radio-inline" for="tnc1">
+                                    <?= /* @noEscape */ __('Yes - I accept the terms & conditions and privacy policy'); ?>
+                                </label>
+                            </div>
+                            <div class="field form-group form-radio">
+                                <input type="radio" name="terms" id="tnc0" value="0" class="custom-radio required">
+                                <label class="label radio-inline" for="tnc0">
+                                    <?= /* @noEscape */ __('No - I do not accept the terms & conditions and privacy policy'); ?> 
+                                </label>
+                            </div>
+                            <div generated="true" class="terms-error" style="display: none"><?= $escaper->escapeHtml(__("This is a required field.")) ?></div>
+                        </div> 
+                    <?php endif; ?>
+                </div>
+                <div class="terms-invoice">
+                    <?php if ($terms['subscription']): ?>
+                        <div <?= /* @noEscape */ ($terms['terms']) ? "style='display:none'" : '' ?> class="subs-pop field form-group form-checkboxes form-check-bordered">
+                            <input type="checkbox" name="subscription" id="subs" class="custom-checkbox checkbox" checked="checked" value="1">
+                            <label class="label" for="subs">
+                                <?= /* @noEscape */ __($communicationText); ?>
+                            </label>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+    <div data-role="loader" class="loading-mask">
+        <div class="loader">
+           <div class="aui-block-loader"></div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a class="btn btn-primary btn-round w-smscpr-100" id="finelogout" href="<?= /* @noEscape */ $this->getUrl('customer/account/logout'); ?>" style="display: none">
+            <?= /* @noEscape */ __('Decline and Log Out'); ?>
+        </a>
+        <button type="button" class="btn btn-primary btn-round submit tncsubmit w-smscpr-100" id="finalsubmit" title="Submit" <?= /* @noEscape */ ($terms['terms']) ? "disabled" : '' ?>>
+            <?= /* @noEscape */ $isPunchoutLogin ? $block->escapeHtml(__('Proceed')): $block->escapeHtml(__('Accept and Continue')); ?>
+        </button> 
+        <span class="spinner-border spinner-border-sm position-absolute" id="actAndContinue" style="display:none"></span>
+    </div>
+</div>
+
+<script type="text/javascript">
+require([
+  'jquery',
+  'mage/mage'
+], function($){
+    var dataForm = $('#terms-form');
+    dataForm.mage('validation', {});
+    $("#finelogout").hide();
+    $(".block-terms-popup #finelogout").click(function(){
+    $('#actAndContinue').show();
+    });
+    $(".block-terms-popup button#finalsubmit").click(function(){
+        $('#actAndContinue').show();
+        $(".terms-error").hide();
+        var data = {"event":"register","eccLocalId":"475934cf-83a8-49bd-984f-def90737a699","eccUserType":"student",
+            "siteName":"shopcpr"};
+         //sendGoogleTagEvent(data);
+        var status = dataForm.validation('isValid');
+        if(status){
+            $.ajax({
+                type : 'POST',
+                url : '<?= /* @noEscape */ $this->geturl("organization/account/saveterms")?>',
+                cache: false,
+                data : jQuery('#terms-form').serialize(),
+                success: function(response){
+                    if(response.invoicing){
+                        window.location.replace(response.redirect_url);
+                    } else if(response.redirect_url){
+                        window.location.replace(response.redirect_url);
+                    }else {
+                        window.location.reload();
+                    }
+                }
+            });
+        } else {
+            $(".terms-error").show();
+        }
+    });
+    
+    $(".block-terms-popup .field input").click(function(){
+        $('button#finalsubmit').removeAttr("disabled");
+        if($(this).val() == 1){
+            $("#finelogout").hide();
+            $("#finalsubmit").show();
+            $(".subs-pop").show();
+            if ($('input#invoicing').is(':checked')) {
+                $(".block-terms-popup #finalsubmit").html("Go to Invoincing Application");
+            } else {
+                $(".block-terms-popup #finalsubmit").html("Accept and Continue");
+            }
+        } else {
+            $("#finelogout").show();
+            $(".subs-pop").hide();
+            $("#finalsubmit").hide();
+        }
+    });
+    
+    $('input#invoicing').change(function(){
+       if($(this).is(':checked') && $(".block-terms-popup input[name='terms']:checked").val() == 1){
+           $(".block-terms-popup #finalsubmit").html("Go to Invoincing Application");
+       } else {
+           $(".block-terms-popup #finalsubmit").html("Accept and Continue");
+       }
+    });
+    $(document).ready(function() {
+        setTimeout(function(){
+             $("#orgpopup .loading-mask").hide();
+        }, 6000);
+    });
+    
+});
+</script>

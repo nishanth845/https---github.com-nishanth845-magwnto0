@@ -1,0 +1,173 @@
+<?php
+/**
+ * @category  AHA
+ * @package   Organization
+ * @author    alexander.rajan@laerdal.com
+ **/
+?>
+<?php
+    $priceHelper = $this->helper('Magento\Framework\Pricing\Helper\Data'); // Instance of Pricing Helper
+    $forestnaHelper = $this->helper('Aha\Forestna\Helper\Data'); // to get real time credit limit
+    $invoicingStatus = \Aha\Organization\Helper\Data::INVOICING_STATUS;
+    $pagination = $this->getConfig('organization/org_setting/org_pagination_count');
+    $focusElement = $this->getRequest()->getParam('focus');
+?>
+<div data-role="loader" class="loading-mask" style="display:none">
+    <div class="loader">
+         <div class="aui-block-loader"></div>
+         <p role="alert">Please wait...</p>
+    </div>
+</div>
+<div class="custom-block-organization block block-organization-info pl-lg-0">
+    <div class="w-100 aui-borderbot d-lg-flex justify-content-between aui-organization-title">
+        <h2 class="h5 font-600 font16 text-nowrap aui-organization-title-label">
+            <?= $block->escapeHtml(__('My Organizations')) ?>
+        </h2>
+        <div class="text-nowrap aui-new-organization aui-red font-500 pb-0">
+            <a id="createneworg" href="javascript:void(0)"><?= $block->escapeHtml(__('Create New Organization Account')) ?><i class="pl-1 aha-icon-arrow-right"></i></a>
+        </div>
+    </div>
+    <div class="row m-0 mt-4 mt-lg-5 justify-content-between" id="org-list">
+        <?php if($block->getOrgList()->getSize()>0){
+            $invoiceingUrl = $this->getConfig('organization/org_setting/invoicing_url');
+            foreach ($block->getOrgList() as $organization) {
+                if(empty($organization->getPoRequest())) {
+                    $invoicing = '<a class="aui-red" aria-label="apply for invoicing '.$block->escapeHtml($organization->getOrgName()).'" href="'. $invoiceingUrl. '" target="_blank">Apply For Invoicing</a>';
+                } elseif($organization->getPoRequest() == 1) {
+                    // $credit_limit = $forestnaHelper->getCreditLimit($organization->getParentId(),$organization->getForestnaId());
+                    // $limit = ($credit_limit !==null ) ? $credit_limit : $organization->getCreditLimit();
+                    $attr = "data-id=".$organization->getParentId()." data-forest=".$organization->getForestnaId() . " data-limit=".$organization->getCreditLimit();
+                    $invoicing = '<span class="aui-red getInvoicePrice" role="link" tabindex="0" id ="getInvoicePrice-'. $organization->getParentId() .'" aria-label="View credit limit" href="javascript:void()" '. $attr .'>View Credit Limit</span>';
+                    //'<span>Up to '. $priceHelper->currency($limit, true, true) .'</span>';
+                } else {
+                    $invoicing = '<span class="pl-1 orglist-invoice-pending scpr-darkgrey">'.$invoicingStatus[$organization->getPoRequest()].'</span>';
+                } ?>
+                <div class="scpr-org-col scpr-mb-30">
+                    <div class="scpr-org-cont card p-3 aha-card-sm" aria-label="Card">
+                        <div class="row no-gutters align-items-start">
+                            <div class="col-2 scpr-mt6">
+                                <img src="<?= /* @noEscape */ $block->getViewFileUrl('Aha_Organization::images/users.svg'); ?>" alt="">
+                            </div>
+                            <div class="col-10 p-0 px-2 card-body font-500 scpr-applyinv">
+                                <p class="d-block mb-sm-3 pb-sm-3 card-title aui-borderbot pb-2">
+                                    <?= $block->escapeHtml($organization->getOrgName()) ?>
+                                </p>
+                                <?php if ($block->isApplyInvoiceAllowed($organization)):?>
+                                    <div class="aui-card-detail pb-sm-2 d-flex align-items-center mb-2">
+                                        <span class="pr-1">Invoicing:</span><?= $invoicing ?>
+                                        <Span class="priceUpdate d-none" id="priceUpdate-<?= $organization->getParentId()?>" role="alert" ></span>
+                                    </div>
+                                <?php endif; ?>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="aui-users" aria-label="Number of users <?= /* @noEscape */ $block->getUserCount($organization->getParentId()) ?>">Users:<span class="pl-1"><?= /* @noEscape */ $block->getUserCount($organization->getParentId()) ?></span></div>
+                                    <div class="aui-modifier aui-red">
+                                        <a aria-label="view or edit of <?= $block->escapeHtml($organization->getOrgName()) ?>" href="<?= $this->getUrl('organization/account/user').'id/'.$organization->getParentId() ?>">
+                                            <?= /* @noEscape */ __("View / Edit") ?>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php }
+        } else { ?>
+            <div class="message info empty scpr-blueicon">
+                <p class="mb-1"><?= $block->escapeHtml(__("You have not set up any organization accounts."))?></p>
+                <p>
+                    <?= $block->escapeHtml(__("You can set up organization accounts for your Training Center or company and use them to apply "
+                        . "for invoicing, add other users to help manage your ordering, and submit tax exempt requests."))?>
+                </p>
+            </div>
+        <?php } ?>
+    </div>
+    <div class="w-100 d-flex justify-content-sm-end justify-content-center pb-4 aui-pagination-mob">
+        <div class="text-center">
+            <div class="col-12 p-0 mt-3" id="org-pagination-container">
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    require([
+        'jquery','Magento_Catalog/js/price-utils'
+    ], function ($, priceUtils) {
+        $(".custom-block-organization .aui-new-organization a").click(function(){
+            newOrgPopup();
+        });
+        $(".getInvoicePrice").click(function(){
+            var id = $(this).attr("data-id");
+            $('.loading-mask').show();
+            var url = "<?= $this->getUrl('organization/account/getCreditLimit')?>";
+            
+            var priceFormat = {
+                decimalSymbol: '.',
+                groupLength: 3,
+                groupSymbol: ",",
+                integerRequired: false,
+                pattern: "$%s",
+                precision: 2,
+                requiredPrecision: 2
+            };
+            
+            $.ajax({
+                url: url,
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    id: $(this).attr("data-id"),
+                    forestna_id: $(this).attr("data-forest")
+                },
+                complete: function(response) {
+                },
+                error: function (xhr, status, errorThrown) {
+                    console.log('Error happens. Try again.');
+                }
+            }).done(function(html) {
+                credit_limit = '$0.00';
+                credit_limit = html.credit_limit;
+                $("#priceUpdate-"+id).text(priceUtils.formatPrice(credit_limit, priceFormat));
+                
+                $("#getInvoicePrice-"+id).attr('role', 'alert').addClass('d-none');
+                $("#priceUpdate-"+id).removeClass('d-none');
+                $('.loading-mask').hide();
+            });
+            
+        });
+        $(window).on('load', function() {
+            $("#org-pagination-container li a.page-link").click(function(){
+                $("body, html").animate({
+                    scrollTop: $(".row.row-container").offset().top
+                }, 600);
+            });
+        });
+    });
+</script>
+<?php 
+
+$scriptString = <<<script
+        require([
+            'jquery',
+            'paginate'
+        ], function($, paginate) {
+            var userLength = $('#org-list').children('div').length;
+            if(userLength > $pagination){
+                $('#org-list').paginate({
+                    slide_pagination_id: "org-list",
+                    items_per_page: $pagination,
+                    button_container_id: "org-pagination-container"
+                });
+            }
+        })
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>
+<script type="text/javascript">
+    var focus = "<?= $block->escapeHtml($focusElement) ?>";
+    if(focus == 'createneworg')
+    {
+        setTimeout(function() {
+          $('#createneworg').focus();
+        }, 3500);
+    }
+</script>

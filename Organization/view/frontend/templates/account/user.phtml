@@ -1,0 +1,248 @@
+<?php  
+    $orgCollection = $block->getUserList();
+    $orgAdminReq = $block->getOrgAdminReq();
+    $customerId = $block->getCustomerId();
+    $orgName = '';
+    $orgId = '';
+    $paginationConfig = $this->getConfig('organization/org_setting/org_usr_pagination_count');
+    $pagination = !empty($paginationConfig) ? $paginationConfig  : 3;
+/** @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer */
+?>
+<div class="custom-block-organization block block-organization-info user-management-block pl-lg-2">
+    <div class="w-100 aui-borderbot d-flex justify-content-between aui-organization-title">
+        <h2 class="col-lg-8 pl-0 h5 font-600 font16 aui-organization-title-label mt-2 mt-md-0 mb-3"><?= $block->escapeHtml(__('User Management: ')) ?>
+            <span class="pl-1" title=""></span>
+        </h2>
+        <div class="text-nowrap aui-new-organization aui-red pb-0">
+            <a id="addnewuser" href="<?= $block->escapeUrl($block->newUserUrl()) ?>"><?= $block->escapeHtml(__('Add a New User')) ?><i class="aha-icon-arrow-right"></i></a>
+        </div>
+    </div>
+    <div id="org-user-list" class="row m-0 user-col-container pl-0">
+        <?php foreach ($orgCollection as $user) : ?>
+            <?php if($user->getCustomerId() == $customerId) {  
+                $firstclass = "col-12 user-col myselflist align-items-center justify-content-between font-500 scpr-sm-font16";
+                $toggelId = "#removal-confirmation-myself";
+                } else {
+                    $firstclass = "col-12 user-col align-items-center justify-content-between font-500 scpr-sm-font16";
+                    $toggelId = "#removal-confirmation-general";
+                }
+            ?>
+        <div class="<?= $firstclass ?>">
+            <?php $orgName = $user->getOrgName(); ?>
+            <?php $orgId = $user->getParentId(); ?>
+            <div class="col-12 col-lg-4 px-0 mb-3 mb-md-0 pr-md-4 text-break">
+                <?= /* @noEscape */ $user->getFirstname().' '.$user->getLastname() ?>
+                <?php if($user->getCustomerId() == $customerId) : ?>
+                <?= "(me)" ?> 
+                <?php endif; ?>
+            </div>
+            <div class="col-10 col-lg-5 text-break px-0">
+                <?= $block->escapeHtml($user->getEmail()) ?>
+            </div>
+            <div class="col-2 col-lg-3 justify-content-end d-flex px-0">
+                <a href="#" data-toggle="modal" 
+                   data-name="<?= /* @noEscape */ $user->getFirstname().' '.$user->getLastname() ?>" 
+                   data-email="<?= $block->escapeHtml($user->getEmail()) ?>" 
+                   data-target="<?= /* @noEscape */ $toggelId ?>" 
+                   data-backdrop="static" 
+                   data-keyboard="false"
+                   data-url="<?= $this->getUrl('organization/account/removeuser').'id/'.$user->getId() ?>" 
+                   class="aha-icon-trash userremove"
+                   role="button"
+                   aria-label="<?= /* @noEscape */ $user->getFirstname().' '.$user->getLastname() ?>"
+                   title="Delete User"></a>
+           </div>
+        </div>
+        <?php endforeach; ?>
+            <?php if($orgAdminReq) : ?>
+                <?php foreach($orgAdminReq as $orgAdmin) : ?>
+                <div class="col-12 user-col align-items-center justify-content-between font-500 scpr-sm-font16">
+                    <div class="col-12 col-lg-4 px-0 mb-3 mb-md-0 pr-md-4 text-break">
+                        <span class="name"><?= ($orgAdmin->getUName()) ? $block->escapeHtml($orgAdmin->getUName()) : "-"?></span>
+                    </div>
+                    <div class="col-10 col-lg-5 text-break px-0">
+                        <span class="email"><?= $block->escapeHtml($orgAdmin->getEmail()) ?></span>
+                    </div>
+                    <div class="col-2 col-lg-3 justify-content-end d-flex px-0">
+                        <a href="#" 
+                           data-toggle="modal" 
+                           data-name="<?= ($orgAdmin->getUName()) ? $block->escapeHtml($orgAdmin->getUName()) : '-'?>" 
+                           data-email="<?= $block->escapeHtml($orgAdmin->getEmail()) ?>" 
+                           data-target="#removal-confirmation-general"
+                           data-backdrop="static" 
+                           data-keyboard="false"
+                           data-url="<?= $this->getUrl('organization/account/removeuser').'uid/'.$orgAdmin->getId() ?>" 
+                           class="aha-icon-trash userremove"
+                           role="button"
+                           aria-label="<?= ($orgAdmin->getUName()) ? $block->escapeHtml($orgAdmin->getUName()) : "-"?>"
+                           title="Delete User"></a>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            <?php endif; ?> 
+    </div> 
+    <div class="w-100 d-flex justify-content-sm-end justify-content-center pb-4 aui-pagination-mob">
+        <div class="text-center">
+            <div class="col-12 p-0 mt-3" id="org-users-pagination-container">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--general popup-->
+<div class="modal fade show aui-org-modal aui-new-org aui-modal removal-confirmation" id="removal-confirmation-general" tabindex="-1" aria-modal="true" role="dialog">
+   <div class="modal-dialog modal-md">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h2 class="h4" aria-label="remove confirmation dialog"><?= $block->escapeHtml(__('Removal Confirmation')) ?></h2>
+         </div>
+         <form>
+            <div class="modal-body p-0">
+               <div class="d-flex flex-wrap mb-4" id="removal-confirmationdiv">Are you sure you want to remove <span class="font-600 userdetails px-1"></span> from <span class="pl-1 font-600"> <?= $block->escapeHtml($orgName) ?> ?</span></div>
+               <div class="d-flex flex-wrap mb-4">They will no longer be able to make purchase on behalf the organization, manage address book, or other similar activities.</div>
+               <div class="d-flex flex-wrap mb-0 mb-md-4">
+                  <div class="form-group form-check-bordered mb-2 mb-md-0">
+                      <input name="remove-confirm" value="1" class="removecheck" type="checkbox" id="remove-confirm"/>
+                        <label for="remove-confirm">I am sure I want to remove <span class="font-600 username"></span> from the Organization</label>
+                  </div>
+               </div>
+            </div>
+            <div class="modal-footer mt-2 mt-md-0 pt-0">
+               <div class="w-100">
+                  <div class="scpr-mobwrap d-flex justify-content-end position-relative">
+                    <button id="org-user-cancle" class="btn btn-secondary btn-round mr-4 cancel mob-sm-100 mb-3 mb-md-0" data-dismiss="modal" aria-label="Cancel Removal Confirmation modal dialog"><?= $block->escapeHtml(__('Cancel')) ?></button>
+                    <button id="org-user-remove" type="button" class="confirm yes btn btn-primary btn-round mob-sm-100 mb-3 mb-md-0" disabled><?= $block->escapeHtml(__('Remove User')) ?></button>
+                    <span class="spinner-border spinner-border-sm position-absolute" id="loading-spinner" style="display:none"></span>
+                  </div>
+               </div>
+            </div>
+         </form>
+      </div>
+   </div>
+</div>
+<!--myself popup-->
+<div class="modal fade show aui-org-modal aui-new-org aui-modal removal-confirmation" id="removal-confirmation-myself" tabindex="-1" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="h4" aria-label="remove confirmation dialog"><?= $block->escapeHtml(__('Removal Confirmation')) ?></h4>
+            </div>
+            <form>
+                <div class="modal-body p-0">
+                    <div class="d-flex flex-wrap mb-4 mt-2">
+                        Are you sure you want to remove <span class="font-600 px-1"> yourself </span> <span class="pr-1">from</span> <span class="font-600"><?= $block->escapeHtml($orgName) ?>?</span>
+                    </div>
+                    <div class="d-flex flex-wrap mb-4">You will no longer be able to make purchase on behalf the organization, manage address book, or other similar activities.</div>
+                    <div class="d-flex flex-wrap mb-0 mb-md-4">
+                        <div class="form-group form-check-bordered mb-2 mb-md-0">
+                            <input type="checkbox" class="removecheck" id="remove-confirm-myself" name ="remove-confirm-myself"value="1">
+                            <label for="remove-confirm-myself">I am sure I want to remove <span class="font-600">myself</span> from the Organization</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer mt-2 mt-md-0 pt-0">
+                    <div class="w-100">
+                        <div class="scpr-mobwrap d-flex justify-content-end">
+                            <button id="org-self-cancle" class="btn btn-secondary btn-round mr-4 cancel mob-sm-100 mb-3 mb-md-0"  data-dismiss="modal" aria-label="Cancel Removal Confirmation modal dialog"><?= $block->escapeHtml(__('Cancel')) ?></button>
+                            <button id="org-self-remove" type="button" class="confirm yes btn btn-primary btn-round mob-sm-100 mb-3 mb-md-0" disabled><span><?= $block->escapeHtml(__('Remove User')) ?></span></button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+   
+<script>
+    require(
+        [
+            'jquery'
+        ],
+        function($) {
+            $(document).ready(function () {
+                $(".myselflist").prependTo("#org-user-list");
+            });
+            //remove confirmation page popup
+            $(".userremove").on('click',function(){ 
+                $(".removal-confirmation .modal-footer #loading-spinner").hide();
+                var name = safe_tags($(this).attr('data-name'));
+                var email = safe_tags($(this).attr('data-email'));  
+                $("#removal-confirmationdiv .userdetails").text('" ' + name + ' "'+ ' ('+ email+') ');
+                $(".username").text(name);
+                $('.confirm.yes').attr('data-url', $(this).attr('data-url'));
+                $('.confirm.yes').attr('data-email', email);
+                $('.confirm.yes').attr('aria-label', 'remove user ' + name);
+                setTimeout(function () {
+                    if($('#removal-confirmation-general').is(":visible")){
+                        $('#org-user-cancle').focus();
+                    }
+                    if($('#removal-confirmation-myself').is(":visible")){
+                        $('#org-self-cancle').focus();
+                    }
+                }, 1000);
+            });
+            
+            $('.cancel').click(function() {
+                $('.removecheck').prop('checked', false);
+                $('#removal-confirmation-general button.confirm').attr("disabled", "disabled");
+                $('#removal-confirmation-myself button.confirm').attr("disabled", "disabled");
+            });
+
+            $(".block-organization-info .aui-organization-title .aui-organization-title-label span").text("<?= $block->escapeHtml($orgName) ?>");
+            $(".block-organization-info .aui-organization-title .aui-organization-title-label span").attr("title","<?= $block->escapeHtml($orgName) ?>");
+            
+            //On click of checkbox
+            $("#remove-confirm").click(function(){
+                if($(this).is(':checked')) { 
+                    $('#removal-confirmation-general button.confirm').removeAttr("disabled");
+                } else { 
+                    $('#removal-confirmation-general button.confirm').attr("disabled", "disabled");
+                }
+            });
+            
+            $("#remove-confirm-myself").click(function(){
+                if($(this).is(':checked')) { 
+                    $('#removal-confirmation-myself button.confirm').removeAttr("disabled");
+                } else { 
+                    $('#removal-confirmation-myself button.confirm').attr("disabled", "disabled");
+                }
+            });
+
+            //onclick of remove user button
+            $('#removal-confirmation-general button.confirm, #removal-confirmation-myself button.confirm').click(function(){
+                $(this).attr('disabled', 'disabled');
+                $(".removal-confirmation .modal-footer #loading-spinner").show();
+                var redirectUrl = $(this).attr('data-url');
+                var orgName = "<?= $block->escapeHtml($orgName) ?>";
+                var orgId = "<?= /* @noEscape */ $orgId ?>";
+                var urlArray = redirectUrl.split("/");
+                if (urlArray[6] == 'id' || urlArray[6] == 'uid'){
+                    var url = MAGE_URL+'organization/account/removeuser/'+urlArray[6]+'/'+urlArray[7]+'/?org='+orgName +'&orgid='+orgId;
+                    window.location.href = url;
+                } else {
+                    location.reload(true);
+                }
+            });
+            
+
+        }
+    );
+</script>
+
+<?php $scriptString = <<<script
+        require([
+            'jquery',
+            'paginate'
+        ], function($, paginate) {
+            var userLength = $('#org-user-list').children('div').length; 
+            if(userLength > $pagination){
+                $('#org-user-list').paginate({
+                    slide_pagination_id: "org-user-list",
+                    items_per_page: $pagination,
+                    button_container_id: "org-users-pagination-container"
+                });
+            }
+        })
+script;
+?>
+<?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false) ?>

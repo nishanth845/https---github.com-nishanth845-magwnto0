@@ -1,0 +1,93 @@
+<?php
+$orgPopup = false;
+if ($this->getRequest()->getFullActionName() != 'customer_address_index'){
+    ?> 
+<div class="modal fade show aui-org-modal aui-modal" id="orgpopup" tabindex="-1" data-backdrop="static" data-keyboard="false" aria-labelledby="organizationpopup-first-popup" aria-modal="true" role="dialog">
+    <div class="modal-dialog modal-lg" id="organizationpopup">
+        <!-- Dynamic content loads here -->
+        <div id="organizationpopup-first-popup"></div>
+    </div>
+</div>
+<?php
+} ?>
+
+<?php if (!strpos($this->getRequest()->getRequestUri(), 'terms-conditions')) { ?>
+    <?php //$this->customerSession->unsCheckoutOrgPopup(); ?>
+    <?php
+    if ($block->isInitPopupRequired() == 1 && !$this->customerSession->getRemovedCurrentOrg()) {
+        $termsPopup = false;
+        if (empty($block->getCustomerOrgId())) {
+            $orgPopup = true;
+        } else {
+            //if($this->customerSession->getTerms()){
+            $termsPopup = true;
+            //}
+        }
+        ?> 
+
+        <script type="text/x-magento-init">
+            {
+            "*": {
+            "Magento_Ui/js/core/app": {
+            "components": {
+            "modal_overlay": {
+            "component": "Aha_Organization/js/modal_overlay",
+            "AjaxUrl": "<?= $block->escapeUrl($block->orgPopupUrl()); ?>",
+            "showOrgPopup":"<?= /* @noEscape */ $orgPopup; ?>",
+            "termsPopup":"<?= /* @noEscape */ $termsPopup; ?>"
+
+            }
+            }
+            }
+            }
+            }
+        </script>
+    <?php } elseif ($block->isLoggedIn() && empty($block->getCustomerOrgId()) || $this->customerSession->getRemovedCurrentOrg()) { ?>
+        <script type="text/javascript">
+            require([
+                'jquery'
+            ], function ($) {
+                changeOrg("Myself");
+            });
+        </script>
+    <?php
+    } elseif ($block->isLoggedIn() && !empty($block->getCustomerOrgId())) {
+        //print_r($this->customerSession->getTerms());
+        //if($this->customerSession->getTerms()){
+        ?>
+        <script type="text/javascript">
+            require([
+                'jquery'
+            ], function ($) {
+                openTermsPopup();
+            });
+        </script>
+    <?php } //} ?>
+    <script>
+        require([
+            'jquery'
+        ], function ($) {
+            $(document).ready(function () {
+                localStorage.removeItem("popupSession");
+                localStorage.removeItem("newOrgPop");
+            });
+        });
+    </script>
+    <?php if($orgPopup){ ?>
+        <script>
+            firstOrgpopup();
+        </script>
+    <?php } ?>
+<?php } ?>
+<script>
+    orgFocus();
+    require([
+        'jquery'
+    ], function ($) {
+        $(window).on('load', function() {
+            setTimeout(function(){
+                 $("#orgpopup .loading-mask").hide();
+            }, 2000);
+        });
+    });
+</script>

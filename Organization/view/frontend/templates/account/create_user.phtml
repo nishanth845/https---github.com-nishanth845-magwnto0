@@ -1,0 +1,80 @@
+<?php
+/**
+ * @category  AHA
+ * @package   Organization
+ * @author    alexander.rajan@laerdal.com
+ * */
+?>
+<?php $tcId = $this->getRequest()->getparam('id'); ?>
+<div class="custom-block-organization block block-organization-info add-user-block pl-lg-0">
+    <div class="w-100 aui-borderbot d-lg-flex justify-content-between aui-organization-title">
+        <h2 class="h5 font-600 font16 aui-organization-title-label mb-0 mb-md-0 mb-lg-3">
+            <?= $block->escapeHtml(__('Add User to ')) ?><?= $block->escapeHtml($block->getOrgName()); ?> 
+        </h2>
+    </div>
+    <div class="row m-0">
+        <form class="form-create-user"
+              action="<?= $block->escapeUrl($block->saveUserUrl()) ?>"
+              method="post"
+              id="form-validate"
+              enctype="multipart/form-data"
+              data-mage-init='{"validation": {}}'
+              autocomplete="off"
+              data-hasrequired="<?= $block->escapeHtmlAttr(__('* Required Fields')) ?>">
+            <p class="pt-3 pt-md-3 mb-4">All users can place orders on this organization account, view past orders, manage addresses, and add or remove other users. They cannot see your personal dashboard or profile details.</p>
+                <div class="col-12 col-lg-6 p-0">
+                    <input type="hidden" name="tc_id" value="<?= $block->escapeHtml($tcId) ?>" />
+                    <input type="hidden" name="orgname" value="<?= $block->escapeHtml($block->getOrgName()); ?>" />  
+                    <div class="form-group ">
+                        <div class="aui-required">
+                            <label for="users-name" class="remove-star"><?= /* @noEscape */ $block->escapeHtml(__("User's Name")) ?><span class="font-600 font-red-dark" aria-hidden="true"> *</span><span class="sr-only">required</span></label>
+                            <input autocomplete="on"
+                                   type="text" 
+                                   name="u_name" 
+                                   data-validate='{"required":true}' 
+                                   aria-required="true"
+                                   class="form-control required-entry input-text font-500" 
+                                   id="users-name" 
+                                   aria-label="User's Name add new user organization <?= $block->escapeHtml($block->getOrgName()); ?>"/>
+                        </div>
+                    </div>
+                    <div class="form-group aui-required">
+                        <div class="aui-required">
+                            <label for="usersinfo-email" class="remove-star"><?= /* @noEscape */ $block->escapeHtml(__("User's Email")) ?><span class="font-600 font-red-dark" aria-hidden="true"> *</span><span class="sr-only">required</span></label>
+                            <input autocomplete="on" type="text" class="form-control required-entry validate-email font-500" 
+                                   name="email" 
+                                   aria-required="true"
+                                   data-validate='{"required":true}'
+                                   id="usersinfo-email">
+                        </div>
+                    </div>
+                </div>
+            <p class="scpr-my-5 scpr-blueicon"><?= $block->escapeHtml(__("If this user already has an account with the AHA, please use the email address associated with that account.")) ?></p>
+            <div class="d-flex justify-content-end">
+                <button class="mob-sm-100 btn btn-round btn-primary add-user-button" disabled id="saveuser" type="submit" title="<?= $block->escapeHtmlAttr(__('Add User to Organization')) ?>">
+                    <?= $block->escapeHtml(__('Add User to Organization')) ?>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/x-magento-init">
+    {
+    "#form-validate": {
+    "validation": {}
+    }
+    }
+</script>
+<script type="text/javascript">
+    require([
+        'jquery'
+    ], function ($) {
+        $(document).ready(function () {
+            setTimeout(function () {
+                $('.form-create-user input:text:visible:first').focus();
+                $("#saveuser").prop("disabled",false);
+            }, 1000);
+        });
+    });
+</script>

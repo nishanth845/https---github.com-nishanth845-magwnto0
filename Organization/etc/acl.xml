@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Aha_Organization::aha" title="AHA" translate="title" sortOrder="21">
+                    <resource id="Aha_Organization::org" title="Organization" translate="title" sortOrder="1">
+                        <resource id="Aha_Organization::organization" title="Manage Organization" translate="title" sortOrder="10"/>
+                        <resource id="Aha_Organization::action" title="Action" translate="title" sortOrder="100">
+                            <resource id="Aha_Organization::changeInvoice" title="Change Invoice Status" translate="title" sortOrder="10"/>
+                            <resource id="Aha_Organization::deleteAction" title="Delete Action" translate="title" sortOrder="20"/>                            
+                        </resource>
+                        <resource id="Aha_Organization::create" title="Add Organization" translate="title" sortOrder="100" />
+                        <resource id="Aha_Organization::edit" title="Edit" translate="title" sortOrder="110">
+                            <resource id="Aha_Organization::delete" title="Delete Organization" translate="title" sortOrder="10"/>
+                            <resource id="Aha_Organization::saveAndContinue" title="Save And Continue" translate="title" sortOrder="20"/>
+                            <resource id="Aha_Organization::save" title="Save" translate="title" sortOrder="30"/>
+                            <resource id="Aha_Organization::cdp" title="CDP" translate="title" sortOrder="40"/>
+                            <resource id="Aha_Organization::orders" title="Orders" translate="title" sortOrder="40"/>
+                            <resource id="Aha_Organization::fields" title="Fields" translate="title" sortOrder="120">
+                                <resource id="Aha_Organization::invoice_status" title="Invoicing Status" translate="title" sortOrder="10"/>
+                                <resource id="Aha_Organization::allocated_credit_limit" title="Allocated Credit Limit" translate="title" sortOrder="20"/>
+                                <resource id="Aha_Organization::customer_group" title="Customer Group" translate="title" sortOrder="30"/>
+                                <resource id="Aha_Organization::tax_exemption" title="Tax Exemption" translate="title" sortOrder="40"/>
+                                <resource id="Aha_Organization::billing_email" title="Billing Email Address" translate="title" sortOrder="50"/>
+                                <resource id="Aha_Organization::billing_cc" title="Billing Email CC" translate="title" sortOrder="60"/>
+                                <resource id="Aha_Organization::storeView" title="Store Selection" translate="title" sortOrder="70"/>
+                                <resource id="Aha_Organization::other_fields" title="Others" translate="title" sortOrder="70"/>
+                            </resource>
+                            <resource id="Aha_Organization::address" title="Address" translate="title" sortOrder="130">
+                                <resource id="Aha_Organization::add_address" title="Add" translate="title" sortOrder="10"/>
+                                <resource id="Aha_Organization::delete_address" title="Delete" translate="title" sortOrder="10"/>
+                            </resource>
+                        </resource>
+                    </resource>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

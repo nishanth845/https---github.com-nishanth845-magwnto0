@@ -1,0 +1,77 @@
+<?xml version="1.0" ?>
+<!--
+/*
+ * @module Aha_Ecards
+ * @author Pallavi Sinha<pallavi.sinha@laerdal.com>
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+         <tab id="aha" translate="label" sortOrder="189">
+            <label>AHA</label>
+        </tab>
+        <section id="organization" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1000"
+                 translate="label">
+            <class>separator-top</class>
+            <label>Organization Settings</label>
+            <tab>aha</tab>
+            <resource>Aha_Organization::org</resource>
+            <group id="org_setting" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10"
+                   translate="label">
+                <label>Organization Settings</label>
+                <field id="distributor_site_url" showInDefault="1" showInStore="1" showInWebsite="1"
+                       sortOrder="10"
+                       translate="label" type="text">
+                    <validate>validate-url</validate>
+                    <label>Distributor site URL</label>
+                </field>
+                <field id="invoicing_url" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20"
+                       translate="label" type="text">
+                    <label>Invoicing Application URL</label>
+                    <validate>validate-url</validate>
+                </field>
+                <field id="tnc_url" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30"
+                       translate="label" type="text">
+                    <validate>validate-url</validate>
+                    <label>Terms and Condition URL</label>
+                </field>
+                <field id="policy_url" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="31"
+                       translate="label" type="text">
+                    <validate>validate-url</validate>
+                    <label>Privacy Policy URL</label>
+                </field>
+                <field id="training_central_url" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="32"
+                       translate="label" type="text">
+                    <validate>validate-url</validate>
+                    <label>Training Central Url</label>
+                </field>
+                <field id="tax_exempt_email" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="33"
+                       translate="label" type="text">
+                    <validate>required-entry validate-email</validate>
+                    <label>Tax Exemption Email</label>
+                </field>
+                <field id="specificmsg" translate="label" type="textarea" sortOrder="33" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <label>Displayed Message</label>
+                </field>
+                <field id="org_pagination_count" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="35"
+                       translate="label" type="text">
+                    <validate>required-entry validate-number</validate>
+                    <comment>Value must be even number.</comment>
+                    <label>Organization per Page</label>
+                </field>
+                <field id="org_usr_pagination_count" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40"
+                       translate="label" type="text">
+                    <validate>required-entry validate-number</validate>
+                    <label>Organization User list per Page</label>
+                </field>
+                <field id="etc_msg_product" translate="label" type="text" sortOrder="43" showInDefault="1" showInWebsite="1" showInStore="1" >
+                <label>ETC Message for Product Page</label>
+                </field>
+                <field id="etc_msg_cart" translate="label" type="text" sortOrder="45" showInDefault="1" showInWebsite="1" showInStore="1" >
+                <label>ETC Message for Cart Page</label>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

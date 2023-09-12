@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Filename     : organization_customer_index.xml
+ * Developer    : Alexander
+ * Company      : AHA
+ * Module       : Aha_Organization
+-->
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/layout_generic.xsd">
+    <container name="root" label="Root">
+        <block class="Aha\Organization\Block\Adminhtml\Organization\Edit\Tab\Customers" name="organization.edit.tab.customers"/>
+        <block class="Magento\Backend\Block\Widget\Grid\Serializer" name="customers_grid_serializer" template="Aha_Organization::widget/grid/serializer.phtml">
+            <arguments>
+                <argument name="grid_block" xsi:type="string">organization.edit.tab.customers</argument>
+                <argument name="callback" xsi:type="string">getSelectedCustomers</argument>
+                <argument name="input_element_name" xsi:type="string">customers</argument>
+                <argument name="reload_param_name" xsi:type="string">index_customers</argument>
+            </arguments>
+        </block>
+    </container>
+</layout>

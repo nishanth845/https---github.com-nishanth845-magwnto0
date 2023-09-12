@@ -1,0 +1,146 @@
+<?php
+/**
+ * @category  AHA
+ * @package   Organization
+ * @author    alexander.rajan@laerdal.com
+ **/
+?>
+<?php
+$orgData = $this->customerSession->getOrgData();
+$cdpList = $block->getCDPList()->getData();
+$tempCDPList = array_unique(array_column($cdpList, 'entity_id'));
+$cdpList = array_intersect_key($cdpList, $tempCDPList);
+$trainingCentralUrl = $this->getConfig('organization/org_setting/training_central_url');
+$orgName = $escaper->escapeHtml(strip_tags($orgData['org_name']));
+$contactUrl = $block->escapeUrl($this->getUrl('intelligo-contact'));
+
+$withPC = __("Please select or enter your <a href=$trainingCentralUrl target=\"_blank\" aria-label=\"Intelligo License Management Opens in new window\" class=\"trainingCred scpr-red font-red btn-text-link-uline\">Intelligo License Management</a> Purchase Code. This allows us to automatically send subscriptions and online courses to your Intelligo License Management upon purchase.");
+$withoutPC = __("Please enter your <a href=$trainingCentralUrl target=\"_blank\" aria-label=\"Intelligo License Management Opens in new window\" class=\"scpr-red\">Intelligo License Management</a> Purchase Code.This allows us to automatically send subscriptions and online courses to your Intelligo License Management upon purchase.");
+$label = __("If you do not know your license management purchase code, please contact <a href=$contactUrl target=\"_blank\" class=\"scpr-red\" aria-label=\"Intelligo License Management contact\">customer support</a>.");
+
+?>
+<div class="modal-content block-step-three">
+    <div class="modal-header">
+        <h2 class="h4" id="organizationpopup-first-popup"><?= /* @noEscape */ __("Intelligo License Management") ?></h2>
+    </div>
+    <div class="modal-body p-0 mt-2">
+            <?php if(count($cdpList) > 0){ ?>
+                <p class="stop-one-des d-block mb-4">
+                    <?= $withPC ?>
+                    <span class="pur-code-info d-block mb-4 mt-3">
+                        <img src='<?= /* @noEscape */ $this->getViewFileUrl('Aha_Organization::images/note_info.svg'); ?>' class="note-icon-purchasecode" alt="" title="Info">
+                        <span class="note-message"><?= $label ?></span>
+                    </span>
+                </p>
+                <?php $pcCodeLabel = "License Management Purchase Code";?>
+            <?php } else {?>
+                <p class="stop-one-des d-block mb-4">
+                    <?= $withoutPC ?>
+                    <span class="pur-code-info d-block mb-4 mt-3"><img src='<?= /* @noEscape */ $this->getViewFileUrl('Aha_Organization::images/note_info.svg'); ?>' class="note-icon-purchasecode" alt="" title="Info" > <span class="note-message"><?= $label ?></span></span>
+                </p>
+                <?php $pcCodeLabel = "License Management Purchase Code"; ?>
+            <?php } ?>
+        <form class="form-step-three"
+                  action="<?= $block->escapeUrl($this->getUrl('organization/account/save')) ?>"
+                  method="post"
+                  id="form-step-three"
+                  enctype="multipart/form-data"
+                  data-hasrequired="<?= $block->escapeHtmlAttr(__('* Required Fields')) ?>">
+            <input type="hidden" name="cdp_id" id="cdp_id" value=''/>
+            <div class="form-group row scpr-purchs-dropdown">
+                <label class="col-lg-4 col-form-label" for="purchase-code"><?= $block->escapeHtml($pcCodeLabel) ?></label>
+                <div class="col-lg-8 d-flex pl-lg-0 scpr-purchs-input">
+                    <?php $hideInputClass=''; ?>
+                    <?php /* if count of purchase code list is more than 1 */ ?>
+                    <?php if(count($cdpList) > 0) { // if db has some cdp purchase code for this customer, then list it ?>
+                        <div class="dropdown w-100">
+                            <button id="taxStatus" role="button" aria-haspopup="true" role="menu" aria-label="<?= /* @noEscape */ __("Purchase Code") ?> dropdown" class="btn btn-primary dropdown-toggle select-purchasecode" data-toggle="dropdown">
+                                <?= /* @noEscape */ __("Purchase Code") ?>
+                            </button>
+                            <div class="dropdown-menu cdp_id_option py-1">
+                                <?php foreach($cdpList as $cdp) { ?>
+                                    <a class="dropdown-item cdp-item" href="#" data-val="<?= $block->escapeHtml($cdp['purchase_code']) ?>" data-org="<?= $block->escapeHtml($cdp['cdp_name']) ?>"><?= $block->escapeHtml($cdp['purchase_code']).' - '.$block->escapeHtml($cdp['cdp_name']) ?></a>
+                                <?php } ?>
+                                <a class="dropdown-item cdp-item scpr-red" href="#" data-val="newcode" <?php if(!empty($status['invalid'])) { echo "selected"; } ?> ><?= /* @noEscape */ __("Enter New Purchase Code") ?></a>
+                            </div>
+                        </div>
+                        <?php $hideInputClass = "style='display:none'"; ?>
+                    <?php } ?>
+                    <input type="text" <?= /* @noEscape */ $hideInputClass ?> id="purchase-code" name="purchase-code" class="input-text required-entry purchasCodeField form-control" placeholder="Enter Purchase Code" aria-label="<?= /* @noEscape */ __("Enter New Purchase Code") ?>" value=""/>
+                    <div generated="true" class="mage-error cdp-error" id="purchase-code-error"></div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer mt-3 mt-lg-4 mb-3">
+        <div class="w-100">
+            <div class="d-flex justify-content-end mb-4 tc-purchase-code">
+                <a role="button" aria-label="Back to the previous screen" href="javascript:void(0);" class="back btn btn-secondary btn-round mr-4"><?= /* @noEscape */ __("Back") ?></a>
+                <a role="button" aria-label="next to Proceed" href="javascript:void(0);" class="next btn btn-primary btn-round"><?= /* @noEscape */ __("Next") ?></a>
+            </div>
+            <div class="d-flex flex-row-reverse scpr-idontpur">
+                <a href="#" aria-label="I do not have a Purchase Code proceed to next screen" class="font-red no-purchase-code"><?= /* @noEscape */ __("I do not have a Purchase Code")?> <i class="aha-icon-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    require([
+        'jquery',
+        'mage/mage'
+    ], function($){
+        var dataForm = $('#form-step-three');
+        dataForm.mage('validation', {});
+
+        /* end */
+        $(".block-step-three a.next").click(function(){
+            $(".cdp-error").empty();
+            var status = dataForm.validation('isValid');
+            if(status){
+                $('.tc-purchase-code a').addClass('disabled');
+                $(".block-step-three .no-purchase-code").css('pointer-events','none');
+                var cdpcode = $("#purchase-code").val();
+                validatePurchaseCode(cdpcode);
+            }
+        });
+
+        $(".block-step-three .cdp_id_option .cdp-item").on("click",function(event){
+            var optionText;
+            var optionVal;
+            optionText = $(this).text();
+            optionVal = $(this).attr('data-val');
+
+            if(optionText.length > 23) {
+                optionText = optionText.substr(0,23)+'...';
+            };
+            if($.trim(optionText) !='') {
+                $(".block-step-three button.select-purchasecode").html(optionText);
+            }
+            $('.scpr-purchs-dropdown').addClass('scpr-dropdownwithinput');
+            if($.trim(optionVal) =="newcode") {
+                $("#purchase-code").show().val("").attr("readonly", false);
+                $("#purchase-code").focus();
+            } else {
+                $("#purchase-code").show().val(optionVal).attr("readonly", true);
+                $(".select-purchasecode").focus();
+            }
+        });
+
+        $(".block-step-three .no-purchase-code").click(function(){
+            $('.tc-purchase-code a').addClass('disabled');
+            $(".block-step-three .no-purchase-code").css('pointer-events','none');
+            $.ajax({
+                type : 'POST',
+                showLoader: true,
+                url : '<?= $block->escapeUrl($this->geturl("organization/account/save"))?>',
+                success: function(response){
+                    window.location.reload();
+                }
+            });
+        });
+
+        $(".block-step-three .back").click(function(){
+            steps(2);
+        });
+    });
+</script>

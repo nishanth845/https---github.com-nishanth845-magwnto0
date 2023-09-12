@@ -1,0 +1,120 @@
+<?php 
+$orgList = $block->getOrgList();
+//$customerOrgId = $block->getCustomerOrgId();
+$authAssociatedOrg = false;
+$checked = "Myself";
+$orgTempData = $this->customerSession->getOrgData();
+if(isset($orgTempData['tc_id_number']) && !empty($orgTempData['tc_id_number'])){
+    $checked = $orgTempData['tc_id_number'];
+}
+
+$adminListArray = array();
+
+if($orgList->getSize()){
+    foreach ($orgList as $admin){
+        if($admin->getIsAdmin() && $admin->getTcIdNumber()){
+            $adminListArray[] = $admin->getTcIdNumber();
+        }
+    }
+}
+
+?>
+<div class="modal-content block-org-popup" id="org-form">
+    <div class="modal-header mb-0 mb-md-2 pt-3 pt-lg-0 pb-2 pb-md-3">
+        <h2 class="h4" id="organizationpopup-first-popup"><?= /* @noEscape */ __("Signing In") ?></h2>
+    </div>
+    <div class="modal-body p-0 mt-2">
+        <p><?= /* @noEscape */ __("Who are you shopping for today ?") ?></p>
+        <form class="tcc-form" method="post">
+            <div class="mt-4" role="radiogroup">
+                <div class="form-group form-radio field">
+                    <input type="radio" name="organization" value="Myself" id="myself" class="custom-radio radio required-entry" <?= /* @noEscape */ ($checked == "Myself") ? "checked" : '' ?> > 
+                    <label class="label" for="myself"><?= /* @noEscape */ __("Myself") ?></label>
+                </div>
+                <?php if($orgList->getSize()) {
+                    foreach ($orgList as $org) {
+                        if($org->getIsAdmin() || (!$org->getIsAdmin() && !in_array($org->getTcIdNumber(), $adminListArray))){
+                            $tcId = $org->getParentId();
+
+                            if($org->getIsAdmin()){ ?>
+                                <div class="form-group form-radio field">
+                                    <input type="radio" name="organization" value="<?= /* @noEscape */ $tcId; ?>" id="org-<?= /* @noEscape */ $tcId; ?>" class="custom-radio radio required-entry"> 
+                                    <label class="label" for="org-<?= /* @noEscape */ $tcId; ?>"><?= $block->escapeHtml($org->getOrgName()) ?></label>
+                                </div>
+                            <?php } else{ ?>
+                                <div class="form-group form-radio field non-tc">
+                                    <input type="radio" name="organization" value="<?= /* @noEscape */ $org->getTcIdNumber(); ?>" id="<?= /* @noEscape */ $tcId; ?>" <?= /* @noEscape */ ($checked == $org->getTcIdNumber()) ? "checked" : '' ?> class="custom-radio radio required-entry"> 
+                                    <label class="label radio-inline" for="<?= /* @noEscape */ $tcId; ?>"><?= $block->escapeHtml($org->getOrgName()) .' (Training Center ID: '.$org->getTcIdNumber().')' ?></label>
+                                </div>
+                            <?php }
+                        }
+                    }
+                }?>
+                <div class="form-group form-radio">
+                    <input type="radio" name="organization" value="setup" id="setup" <?= /* @noEscape */($checked == "setup") ? "checked" : '' ?> class="custom-radio radio required-entry setup"> 
+                    <label class="label" for="setup"><?= /* @noEscape */ __("Create New Organization") ?></label>
+                    <div class="mage-error aui-red font-14 d-none" id="tc-id-error" style="">This is a required field.</div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer position-relative">
+        <button aria-label="" class="btn btn-link btn-round w-smscpr-100 mb-4 mb-sm-0" id="finalcancle"><?= /* @noEscape */ __("Cancel") ?></button>
+        <button aria-label="" class="btn btn-primary btn-round submit ml-0 ml-sm-5 w-smscpr-100"><?= /* @noEscape */ __("Accept and Continue") ?></button>
+        <span class="shop-conf-loader spinner-border spinner-border-sm position-absolute" style="display:none"></span>
+    </div>
+</div>
+
+<script type="text/javascript">
+require([
+  'jquery',
+  'mage/mage'
+], function($){
+    $(".mage-error").hide();
+    $(".block-org-popup button.non-tc-submit").hide();
+    
+    $(".block-org-popup button.submit").click(function(){
+        $(".block-org-popup .shop-conf-loader").show();
+        if ($("input[name='organization']:checked").length > 0){
+            $(".mage-error").hide();
+            var id = $("input[name='organization']:checked").val();
+            if(id == "setup"){
+                //steps(1);
+                newOrgPopup();
+            } else {
+                changeOrg(id);
+            }
+        } else{
+            $(".mage-error").show();
+        }
+    });
+    
+    //radio button click function
+    $(".block-org-popup .field input").click(function(){
+        $(".mage-error").hide();
+        if($(this).parent().hasClass( "non-tc" )){
+            $(".block-org-popup button.non-tc-submit").show();
+            $(".block-org-popup button.submit").hide();
+        } else {
+            $(".block-org-popup button.submit").show();
+            $(".block-org-popup button.non-tc-submit").hide();
+        }
+    });
+    
+    //validate TC
+    $(".block-org-popup button.non-tc-submit").click(function(){
+        if ($("input[name='organization']:checked").length > 0){
+            var id = $("input[name='organization']:checked").val();
+            validateTC(id);
+        }
+    });
+    
+    //click on cancel button, defaulted to myself
+    $("#finalcancle").click(function(){
+        changeOrg("Myself");
+    });
+    
+    setPopupSession("initOrgPopup()");
+    
+});
+</script>

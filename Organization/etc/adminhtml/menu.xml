@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Filename     : menu.xml
+ * Developer    : Alexander
+ * Company      : AHA
+ * Module       : Aha_Organization
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Aha_Organization::aha" title="AHA" translate="title" module="Aha_Organization" sortOrder="21" dependsOnModule="Aha_Organization" resource="Aha_Organization::aha"/>
+        <add id="Aha_Organization::org" title="Organization" translate="title" module="Aha_Organization" sortOrder="1" parent="Aha_Organization::aha" resource="Aha_Organization::org"/>
+        <add id="Aha_Organization::organization" title="Manage Organization" translate="title" module="Aha_Organization" sortOrder="1" parent="Aha_Organization::org" action="organization/index/index" resource="Aha_Organization::organization"/>
+    <remove id="Magento_Analytics::business_intelligence" />
+    <remove id="Magento_Reports::report_marketing" />
+    <remove id="Magento_Reports::report_statistics" />
+    <remove id="Magento_Invitation::report_magento_invitation" />
+    <remove id="Magento_Review::report_review" />
+    </menu>
+</config>

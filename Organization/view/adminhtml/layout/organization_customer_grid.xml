@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Filename     : organization_customer_grid.xml
+ * Developer    : Alexander
+ * Company      : Aha
+ * Module       : Aha_Organization
+-->
+<layout xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/layout_generic.xsd">
+    <container name="root" label="Root">
+        <block class="Aha\Organization\Block\Adminhtml\Organization\Edit\Tab\Customers" name="organization.edit.tab.customers"/>
+    </container>
+</layout>

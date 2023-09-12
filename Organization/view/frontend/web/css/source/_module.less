@@ -1,0 +1,447 @@
+// /**
+//  * Copyright © Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+/*My Org user less Start*/
+.account.organization-account-createuser {
+	.page-title-wrapper .page-title {
+		@media only screen and (max-width: 575px) {font-weight: 600 !important;}
+	}
+}
+#tc-id-error, #org_name-error, #tax_exempt_note, #bill_email-error, #telephone-error, #billing_email_cc-error, #street_1-error, #zip-error, #region_id-error, #city-error {
+    font-size: 14px;
+    margin-top: 10px;
+    color: #EB0F25;
+    position: inherit;
+    width: 100%;
+}
+#telephone-error {position: relative !important;float:left;}
+.modal.show.aui-org-modal {overflow-x: hidden;overflow-y: auto;}
+.scpr-select-color {background: #f8f8f8;}
+.scpr-red {color: #c10e21 !important;}
+.form-control.scpr-select-color {background-color: #f8f8f8;}
+.form-group.row.scpr-purchs-dropdown.scpr-dropdownwithinput {margin-bottom: 0;}
+.aui-org-modal .scpr-purchs-dropdown .scpr-purchs-input #purchase-code-error.cdp-error {
+	top:37px;
+}
+.aui-org-modal {
+	#org-form {
+		.aui-buyingfor-popup-close{
+			.aha-modal-close{
+				font-size: 3rem;
+				font-weight: normal;
+				color: #222328;
+				opacity: 1;
+			}
+		}
+	}
+	.scpr-purchs-dropdown {
+		.dropdown {
+			.dropdown-toggle {
+				width: 100%;
+			    background: #F8F8F8;
+			    color: #222328;
+			    text-align: left;
+			    padding: 8px 10px;
+			    border-radius: 0;
+			    border: 1px solid #777979;
+			    font-weight: normal;
+			    &:after {
+			    	border-top: 2px solid #222328;
+	    			border-right: 2px solid #222328;
+	    			width: 10px;
+	    			height: 10px;
+	    			right: 15px;
+				    position: absolute;
+				    top: 12px;
+			    }
+			    &:active {
+			    	border: 1px solid #777979;
+			    	background: #fff;
+			    	color: #222328;
+			    }
+			}
+			.dropdown-menu {
+				width: 100%;
+				border: 1px solid #e3e3e3;
+				border-radius: 0;
+				padding: 0;
+				z-index: 1;
+				.dropdown-item {
+					padding: 8px 10px;
+					border-bottom: 1px solid #e3e3e3 !important;
+					white-space: inherit;
+					&:last-child {border-bottom: 0 !important;}
+				}
+				&:active {
+					border: 1px solid #777979;
+			    	background: #fff;
+			    	color: #222328;
+				}
+			}
+			#purchase-code {
+				@media only screen and (max-width: 992px) {height: 2.5rem;}
+			}
+		}
+		&.scpr-dropdownwithinput {
+			.dropdown, .purchasCodeField {width: 50% !important;}
+			
+			.scpr-purchs-input {
+				@media only screen and (max-width: 991.98px) {
+					.purchasCodeField {margin-top: 1rem;}
+					flex-wrap: wrap;
+					.dropdown {
+						width: 100% !important;
+						//margin-bottom: 1rem;
+					}
+					#purchase-code {width: 100% !important;height: 2.5rem;}
+					.cdp-error, .mage-error, .cdp-error.mage-error{position: static; }
+				}
+				@media only screen and (max-width: 575.98px) {
+					.cdp-error, .mage-error, .cdp-error.mage-error{position: static !important; }
+				}
+				@media only screen and (min-width: 992px){
+					#purchase-code {
+						position: relative;
+						top: 0;
+					}
+				}
+				.mage-error {
+					@media only screen and (min-width: 992px) {left: inherit; top: 40px;}
+				}
+				.cdp-error.mage-error {
+					@media only screen and (min-width: 992px) {left: inherit; top: 40px;}
+				}
+			}
+		}
+		.scpr-purchs-input {
+			position: relative;
+			.cdp-error, .mage-error:not(#purchase-code) {
+				position: absolute;
+			    top: 45px;
+			    font-size: 14px;
+			    color: #EB0F25;
+			    left: 0;
+			    margin: 0;
+			}
+			.cdp-error, .mage-error, .cdp-error.mage-error{
+				@media only screen and (max-width: 991.98px) {
+					left: 15px !important;
+					text-align: left;
+				}
+		}
+		  .new_pc.form-control {border: 1px solid #777979;}
+			#purchase-code-error{
+				@media only screen and (max-width: 575.98px) {
+					top: 37px;
+					line-height: 17px;
+				}
+			}
+		}
+	}	
+	@media only screen and (max-width: 576px) {
+		.form.cart-confirmation-org {
+			.modal-footer button {width: 100%;}
+		}
+	}
+	p {word-break: normal !important;}
+	.orgproceed{
+		@media only screen and (max-width: 575.98px) {
+			width: 100%;
+		}
+	}	
+}
+.block-step-three .dropdown-menu.cdp_id_option.show{
+	max-height: 250px;
+	overflow-y: scroll;
+}
+.block-step-one #tax_exempt_note{
+	@media only screen and (min-width: 992px) {
+		width: 63%;
+    	margin-left: 35%;
+	}
+	@media only screen and (max-width: 992px) and (min-width: 768px){
+		width: 55%;
+    	margin-left: 44%;
+	}  
+}
+.block-organization-create, .block-step-one, .block-step-two, .block-step-three{
+	@media only screen and (max-width: 359px) and (min-width: 320px){
+		a.back{
+			padding: 4px 16px;
+		}
+		a.next{
+			padding: 4px 16px;
+		}
+		}
+}
+#tax_exempt_note{
+@media only screen and (max-width: 767.98px) and (min-width: 576px){
+	width: 94%;
+	margin: auto;
+	margin-top: 10px;
+}
+@media only screen and (max-width: 575.98px) and (min-width: 320px){
+	width: 90%;
+	margin: auto;
+	margin-top: 10px;
+}
+}
+.block-step-three .pur-code-info{
+	color: #31708F;
+	display: flex !important;
+    align-items: flex-start;
+	.note-message{
+	padding-left: 8px;
+	margin-top: -2px;
+	}
+}
+.tc-billing-detail, .tc-purchase-code, .tc-id, .tc-detail{
+	@media only screen and (max-width: 575.98px){
+		flex-wrap: wrap;
+		.back{
+			width: 100%;
+			margin-bottom: 20px;
+			margin-right: 0 !important;
+		}
+		.next{
+			width: 100%;
+		}
+	}
+}
+.no-purchase-code{
+	@media only screen and (max-width: 575.98px){
+	justify-content: center;
+	white-space: nowrap;
+	}
+}
+.no-tc{
+	@media only screen and (max-width: 575.98px){
+	justify-content: center;
+	}
+}
+.tc-billing-detail {
+	@media only screen and (max-width: 767.98px) and (min-width: 576px){
+		float: right;
+	}
+}
+.block-organization-create{
+	.tc_id{
+		margin-bottom: 10px;
+	}
+}
+.block-step-three .note-icon-purchasecode{
+	height:20px;
+}
+.scpr-my-5 {margin: 2rem 0 !important;}
+/*My Org user less End*/
+/*user managment css Start*/
+.organization-account-user {
+	.page-title-wrapper .page-title{
+		@media (min-width:768px) and (max-width:991.98px) {
+			font-weight: 500 !important;
+		}
+	}
+	.aui-myaccount-cont{
+		.row-container.mob-row-container{
+			@media (min-width:576px) and (max-width:767.98px) {
+			padding-top: 0px !important;
+			}
+		}
+	}
+	.account-info{
+		@media only screen and (max-width: 767px) and (min-width: 576px) {
+			margin-top: 0px !important;
+		}
+	}
+	.user-management-block {
+		.user-col {
+			display: flex;
+			@media only screen and (max-width: 992px) {padding: 20px 16px;flex-wrap: wrap;margin-bottom: 24px;}}
+		.user-col-container {@media only screen and (max-width: 767px) {padding-top: 24px;}}
+	}	
+	&.account .page-title-wrapper .page-title {
+		@media only screen and (max-width: 992px) and (min-width: 768px) {font-weight: 500 !important;}
+	}
+}
+.mob-sm-100 {
+	@media only screen and (max-width: 575.98px) {width: 100%;}
+}
+.scpr-mobwrap {
+	@media only screen and (max-width: 575.98px) {
+		flex-wrap: wrap;
+		.cancel {margin-right: 0 !important;}
+	}	
+}
+.add-user-block div.mage-error {
+	color: #EB0F25;
+	font-size: 14px;
+	padding-top: 5px;
+}
+.scpr-darkgrey {color: #707070;}
+.scpr-mb-30 {
+	margin-bottom: 48px;
+	@media only screen and (max-width: 992px) {margin-bottom: 30px;}
+}
+.block-organization-info {
+	.scpr-org-col {
+		@media only screen and (max-width: 1200px) {width: 100%;}
+		.scpr-org-cont {
+			width: 378px;
+			font-size: 1rem;
+			@media only screen and (max-width: 450px) {padding: 12px !important;}
+			@media only screen and (max-width: 1200px) {width: 100%;}
+			.col-2.scpr-mt6 {
+				@media only screen and (min-width: 450px) and (max-width: 1200px) {display: flex;justify-content: center;}	
+			}
+			.scpr-applyinv {
+				@media only screen and (max-width: 575.98px) {
+					padding-right: 0 !important;
+					.card-title{
+						padding-bottom: 12px !important;
+					}
+					.aui-card-detail{
+						padding-bottom: 4px;
+					}
+				}
+				.aui-card-detail{
+					.getInvoicePrice{
+						&:focus{
+							outline: 2px solid #E17509 !important;
+							-webkit-box-shadow: 0 0 4px 4px #E17509 !important;
+							box-shadow: 0 0 4px 4px #E17509 !important;
+							text-decoration: underline;
+						}
+						&:hover{
+							text-decoration: underline;
+						}
+						cursor: pointer;
+					}
+					@media only screen and (max-width: 575.98px) {
+							font-size: 14px;
+					}
+				}
+				@media only screen and (max-width: 575.98px) {
+					.aui-users{
+						font-size: 14px;
+					}
+					.aui-modifier{
+						font-size: 14px;
+					}
+				}	
+			}
+			&.aha-card-sm .card-body .card-title {
+				line-height: 1.5rem;
+				@media only screen and (min-width: 768px) and (max-width: 991px){
+					font-size: 1rem !important;
+				}
+			}
+		}
+	}	
+	.aui-organization-title {
+		@media only screen and (min-width: 320px) and (max-width: 992px) {padding-bottom: 1rem;}
+		@media only screen and (max-width: 575.98px) {flex-wrap: wrap;}
+	}
+}
+.scpr-mt6 {margin-top: 6px;}
+.scpr-sm-font16 {
+	@media only screen and (max-width: 767.98px) {font-size: 1rem;}
+}
+/*user managment css End*/
+#orgpopup {
+	.terms-form, .tcc-form {
+		.form-group.form-radio {
+			.label {padding-left: 2rem;}
+		}
+	}	
+	div.mage-error {font-size: 14px;color: #EB0F25;margin-top: 10px;}
+	#tc-id-donthave, .no-purchase-code {
+		font-size: 1rem;
+		@media only screen and (min-width: 575.98px) {margin-right: -6px;}
+	}
+	#tc_id {
+		@media only screen and (max-width: 575.98px) {margin-bottom: 0;}	
+	}
+	.block-organization-create .form-group.row.required {
+		@media only screen and (max-width: 575.98px) {margin-bottom: 0;}		
+	}
+	@media only screen and (max-width:450px){
+		select#region_id{
+			font-size: 11px;
+		}
+	}
+}
+.w-smscpr-100 {
+	@media only screen and (max-width: 575.98px) {width: 100%;}	
+}
+.scpr-idontpur {
+	@media only screen and (max-width: 575.98px) {justify-content: center;}		
+}
+.block-organization-etc .modal-footer .footjusbetween {
+	a {font-weight: 500;font-size: 1rem;}
+	@media only screen and (max-width: 992px) {
+		justify-content: space-between !important;
+		a {font-weight: 400;}
+	}
+}
+.error-red {color: #EB0F25 !important;}
+.form-create-user .form-group label {font-size: 1rem;}
+.organization-account-index .message.info.empty.scpr-blueicon {
+	margin-top: -30px;
+	@media only screen and (max-width: 992px) {margin-top: -10px;}
+}
+
+.scpr-org-container {
+	.aui-search-dropdown .aui-search-ui li {
+		padding: 0 !important;
+		.aui-search-li {
+			padding: 10px;
+		    display: flex;
+		    flex-wrap: wrap;
+		}
+	}
+}
+
+.removal-confirmation {
+    .modal-footer {
+        #loading-spinner {
+            top: 12px;
+            right: 15px;
+            color: #fff;
+        }
+    }
+}
+
+#organizationpopup{
+	#actAndContinue {
+		right: 15px;
+		color: #fff;
+	}
+	#termsAndcon{
+		right: 15px;
+		color: #fff;
+		@media only screen and (min-width: 576px) {
+			right: 40px;
+		}
+		@media only screen and (max-width: 575.98px) {
+			right: 30px;
+		}
+	}
+}
+
+@media only screen and (max-width: 991.98px){
+	.organization-account-index .aui-org-modal .scpr-purchs-dropdown.scpr-dropdownwithinput .scpr-purchs-input {
+		.cdp-error, .mage-error, .cdp-error.mage-error{
+			position: static !important;
+		}
+	}
+}
+.aui-lt-red {
+	color: #EB0F25;
+}
+.organization-account-createuser{
+	.form-group .aui-required > label.remove-star:after {
+		content: "";
+	}
+}

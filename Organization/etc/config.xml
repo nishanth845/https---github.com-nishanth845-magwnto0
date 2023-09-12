@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <organization>
+            <org_setting>
+                <invoicing_url>https://www.heart.org/</invoicing_url>
+                <distributor_site_url>https://www.heart.org/</distributor_site_url>
+                <tax_exempt_email>shopcpr@email.shopcpr.heart.org</tax_exempt_email>
+                <org_pagination_count>8</org_pagination_count>
+                <org_usr_pagination_count>5</org_usr_pagination_count>
+                <training_central_url>https://elearning.heart.org/trainingcentral</training_central_url>
+                <etc_msg_product>According to our records, WorldPoint is the exclusive distributor for your Training Center to purchase AHA CPR and ECC educational materials.</etc_msg_product>
+                <etc_msg_cart>According to our records, WorldPoint is the exclusive distributor for your Training Center to purchase AHA CPR and ECC educational materials.</etc_msg_cart>
+            </org_setting>
+        </organization>
+    </default>
+    <websites>
+        <insights>
+            <organization>
+                <org_setting>
+                    <training_central_url>https://odin-stg.heartblr.org/</training_central_url>
+                    <specificmsg>Note: Tax will not be waived on orders until a valid tax certificate has been submitted to support@intelligohub.org. Please allow 2 to 3 business days for review and approval.</specificmsg>
+                </org_setting>
+            </organization>
+        </insights>
+    </websites>
+</config>

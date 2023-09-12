@@ -1,0 +1,24 @@
+{
+    "aha_tnc_acceptance": {
+        "column": {
+            "entity_id": true,
+            "customer_id": true,
+            "org_id": true,
+            "website_id": true,
+            "store_id": true,
+            "created_at": true,
+            "updated_at": true,
+            "group_id": true
+        },
+        "index": {
+            "AHA_TNC_ACCEPTANCE_CUSTOMER_ID": true,
+            "AHA_TNC_ACCEPTANCE_ORG_ID": true,
+            "AHA_TNC_ACCEPTANCE_WEBSITE_ID": true,
+            "AHA_TNC_ACCEPTANCE_STORE_ID": true,
+            "AHA_TNC_ACCEPTANCE_GROUP_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    }
+}

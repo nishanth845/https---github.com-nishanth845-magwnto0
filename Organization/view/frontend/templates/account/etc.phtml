@@ -1,0 +1,39 @@
+<?php
+/**
+ * @category  AHA
+ * @package   Organization
+ * @author    alexander.rajan@laerdal.com
+ **/
+?>
+<div class="modal-content block-organization-etc">
+    <div class="modal-header m-0">
+        <h2 class="h4" id="organizationpopup-first-popup"><?= $block->escapeHtml(__('Distributor Notice')) ?></h2>
+    </div>
+    <div class="modal-body p-0 mt-4">
+        <div class="etc">
+            <p class="stop-one-des">According to our records, WorldPoint is the exclusive distributor for your Training Center to purchase AHA CPR & ECC educational materials.</p>
+        </div>
+    </div>
+    <div class="modal-footer mt-4">
+        <div class="w-100">
+            <div class="d-flex justify-content-end footjusbetween">
+                <a aria-label="Back to the previous screen" href="javascript:void(0);" class="back btn-link btn aui-red mr-5"><?= /* @noEscape */ __("Back") ?></a>
+                <a aria-label="Go to Worldpoint" href="javascript:void(0);" class="next btn-link btn aui-red action distributer-link"><?= /* @noEscape */ __("Go to Worldpoint") ?></a>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    require([
+        'jquery'
+    ], function ($) {
+        $(".block-organization-etc .back").click(function(){
+            back();
+        });
+        
+        $("a.distributer-link").click(function(){
+            window.open("<?= $block->escapeUrl($this->getUrl('customer/account/logout')) ?>", "_self");
+            window.open("<?= $block->escapeUrl($this->getEtcURL()) ?>","_blank");
+        });
+    });
+</script>

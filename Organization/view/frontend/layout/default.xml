@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="main">
+            <block class="Aha\Organization\Block\Popup" template="Aha_Organization::modal_overlay.phtml" name="org_popup" as="org_popup" cacheable="false" />
+        </referenceContainer>
+    </body>
+</page>

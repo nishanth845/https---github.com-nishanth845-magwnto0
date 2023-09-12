@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Filename     : routes.xml
+ * Developer    : Alexander
+ * Company      : AHA
+ * Module       : Aha_Organization
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
+    <router id="admin">
+        <route id="organization" frontName="organization">
+            <module name="Aha_Organization"/>
+        </route>
+    </router>
+</config>

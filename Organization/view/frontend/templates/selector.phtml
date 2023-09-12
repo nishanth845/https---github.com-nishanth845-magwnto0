@@ -1,0 +1,200 @@
+<?php
+$orgList = $block->getOrgList();
+$selectedvalue = $this->customerSession->getOrganization();
+
+if($orgList->getSize()) {
+    /*
+     * Added to Redirection in Customer New address add/Edit functionality to redirect to address dashboard
+     */
+     $controllerName = $this->getRequest()->getControllerName();
+     $moduleName = $this->getRequest()->getModuleName();
+    ?>
+    <div class="d-flex scpr-org-switcher">
+        <div class="input-group flex-nowrap">
+            <div class="aui-label">
+                <label class="input-group-text aui-buyfor-txt font-500" for="aui-select-active"><?= /* @noEscape */ __('I am buying for') ?><span class="sr-only">dropdown</span></label>
+            </div>
+            <div id="aui-search-dropdown" class="aui-search-dropdown">
+                <div class="aui-input-div position-relative">
+                    <input role="button" aria-expanded="false" id="aui-select-active" class="w-100 text-truncate form-control" autocomplete="off" placeholder=""/>
+                    <i class="aha-icon-arrow-down pr-2 position-absolute aui-downicon" role="img" aria-label="I am buying for dropdown collapsed button"></i>
+                    <span class="scpr-orgtooltip"></span>
+                </div>
+                <ul id="aui-select-ul" class="aui-search-ui">
+                    <li data-value="Myself" id="Myself" class="<?= /* @noEscape */ ($selectedvalue) == 'Myself' ? 'selected' : '' ?>">
+                        <a href="javascript:void(0)" class="aui-search-li sub-org-name" data-name="Myself">Myself</a>
+                    </li>
+                    <?php foreach ($orgList as $value){ ?>
+                        <?php $tcId = $value->getTcIdNumber(); ?>
+                        <?php if($value->getParentId() == $selectedvalue) {$selected = "selected";} else { $selected = '';} ?>
+                        <li data-value="<?= /* @noEscape */ $value->getParentId() ?>" id="<?= /* @noEscape */ $value->getParentId() ?>" class="<?= /* @noEscape */ $selected ?>">
+                            <?php if($value->getParentName() && $value->getSubOrg() == 1) {?>
+                                <a href="javascript:void(0)" class="aui-search-li parent-org-name"><?= $block->escapeHtml($value->getParentName()) ?></a>
+                            <?php } ?>
+                            <a href="javascript:void(0)" class="aui-search-li sub-org-name" data-name="<?= $block->escapeHtml($value->getOrgName())?>"><?= $block->escapeHtml($value->getOrgName())?></a>
+                        </li>
+                    <?php } ?>
+                    <li class="scpr-noresultli"><span class="aui-no-result-li">No Results Found</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        require([
+            'jquery',
+            'mage/mage'
+        ], function($){
+            $(document).ready(function(e){
+                var text = safe_tags($("#aui-select-ul li.selected .sub-org-name").attr("data-name"));
+                $("#aui-select-active").attr("value", text);
+                $("#aui-select-active").attr("placeholder", text);
+                //$("#aui-select-active").attr("title", text);
+                $('.scpr-orgtooltip').html(text);
+                $("#aui-select-ul").on("click", "li", function() {
+                    
+                    if ($(this).hasClass("selected")) {
+                        var text = $("#aui-select-ul li.selected .aui-search-li").text()
+                        $("#aui-select-active").attr("value", text);
+                    } else {
+                        $("#aui-select-ul li").removeClass('selected');
+                        $(this).addClass('selected');
+                        var option = $(this).attr("data-value");
+                        //reset the seession value if user switch the org
+                        if(option !== ''){
+                            var url = MAGE_URL + 'organization/popup/resetsession';
+                            $.ajax({
+                                url: url,
+                                type: 'POST',
+                                dataType: "json",
+                                showLoader: false,
+                                success: function (response) {
+                                    return true;
+                                }
+                            });
+
+                            var url = MAGE_URL + 'organization/popup/changeorg';
+                            $.ajax({
+                                url: url,
+                                type: 'POST',
+                                data: {
+                                    id: option
+                                },
+                                dataType: "json",
+                                showLoader: true,
+                                success: function (response) {
+                                    localStorage.setItem('cartAddressId', '');
+                                    localStorage.setItem('applied_tax_amount', '');
+                                    var moduleName = '<?= /* @noEscape */ $moduleName;?>';
+                                    var controllerName = '<?= /* @noEscape */ $controllerName;?>';
+                                if(controllerName=='account')
+                                {
+                                    window.location.href = response.redirect_url; 
+                                }    
+                                else if(moduleName =='customer' || moduleName=='changeaddress')
+                                {
+                                    var serviceUrl = MAGE_URL + 'customer/address';
+                                    $(location).attr('href',serviceUrl); 
+                                    return false; 
+                                }
+                                else
+                                {
+                                    window.location.href = response.redirect_url;
+                                }
+                                
+                                }
+                            });
+                        }
+                    }
+                });
+                $("#aui-select-active").on('blur', function() {
+                    $("#aui-select-active").attr("value", text);
+                    $("#aui-select-active").attr("placeholder", text);
+                });
+                $('.scpr-org-container').addClass('scpr-hasorg');
+                $('input#aui-select-active').on("focus", function(){
+                    $('.nav-item.show ul.submenu').removeClass('show');
+                });   
+            });
+            $("#aui-select-ul li").keydown(function(e) {
+                if (e.keyCode == 13) {
+                    $(this).click();
+                }
+                if(e.keyCode == 40){
+                    if($(this).next()){
+                        $(this).closest("li").next().find("a").first().focus();
+                        return false;
+                    }else{
+                        $(this).parent().children(':first-child').focus();
+                    }
+                }
+                if(e.keyCode == 38){
+                    if($(this).prev()){
+                        $(this).closest("li").prev().find("a").first().focus();
+                        return false;
+                    }else{
+                        $(this).parent().children(':last-child').focus();
+                    }
+                }
+            });
+            if ($(window).width() > 992) {
+                $("#aui-select-active").on('click', function(){
+                    $('.scpr-profile-drop').removeClass('show');
+                    var mini = $('.ui-widget-content').css("display");
+                    if(mini == "block"){
+                       $('.minicart-wrapper .showcart').click();
+                    }
+                });
+                $('.aui-profile .dropdown-toggle').on('click', function(){
+                    $('.aui-search-ui').removeClass('aui-show-ul');
+                });
+                $('.minicart-wrapper .showcart').on('click', function(e){
+                    var mini = $('.ui-widget-content').css("display");
+                    if(mini == "none"){
+                        $('.ui-widget-content').css("display" , "block");
+                        $('.aui-search-ui').removeClass('aui-show-ul');
+                        $('.dropdown-menu').removeClass('show'); 
+                    }
+                    else{
+                        $('.ui-widget-content').css("display" , "none");
+                    }
+                });
+                }
+                
+                $("#aui-select-active").on('click touchstart', function(){
+                    $('.dropdown-menu').removeClass('show');
+                    $(document).ready(function() {
+                        if ($('.aui-input-div').hasClass('show')) {
+                            $('#aui-select-active').attr('aria-expanded','true');
+                            $('.aha-icon-arrow-down').attr('aria-label','I am buying for dropdown expanded button');
+                        } else {
+                            $('#aui-select-active').attr('aria-expanded','false');
+                            $('.aha-icon-arrow-down').attr('aria-label','I am buying for dropdown collapsed button');
+                        }
+                    });
+                });
+                $('.aui-profile .dropdown-toggle').on('click', function(){
+                    $('.aui-search-ui').removeClass('aui-show-ul');
+                    var mini = $('.ui-widget-content').css("display");
+                    if(mini == "block"){
+                       $('.minicart-wrapper .showcart').click();
+                    }
+                });
+                $('body').keydown(function(e){
+                    if(e.keyCode == 27 && $('#aui-search-dropdown #aui-select-ul.aui-show-ul').length > 0) {//press esc key
+                    $('#aui-search-dropdown ul#aui-select-ul').removeClass('aui-show-ul');
+                    }
+                });
+        });
+    </script>
+<?php } else { ?>
+<script type="text/javascript">
+require([
+    'jquery',
+    'mage/mage'
+], function($){
+    $(document).ready(function(){
+        $('body').addClass('scpr-newuser');
+    });
+});
+</script>
+<?php } ?>

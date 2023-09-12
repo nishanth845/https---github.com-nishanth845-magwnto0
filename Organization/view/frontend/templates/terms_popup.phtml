@@ -1,0 +1,149 @@
+<?php
+/** @var Aha\Organization\Block\Popup $block */
+$terms = $block->getTerms(); 
+$termsUrl = $this->getConfig('organization/org_setting/tnc_url');
+$policyUrl = $this->getConfig('organization/org_setting/policy_url');
+$isPunchoutLogin = $block->getIsPunchoutLogin();
+$orgName = strip_tags((string)$this->customerSession->getOrgName());
+$communicationText = "Send me communications about AHA training and products for CPR and first aid.";
+
+if( $this->storeManager->getWebsite()->getCode() == \Aha\StoreSwitcher\Helper\Data::INSIGHTS_WEBSITE_CODE) {
+    $communicationText = "Send me communications about AHA training.";
+}
+?>
+<div class="modal-content block block-terms-popup">
+    <div class="modal-header m-0 pb-2 pb-md-3">
+        <h4 class="h4" id="organizationpopup-first-popup">
+            <?= $isPunchoutLogin ?
+                $block->escapeHtml(__('Communication Preferences')) :
+                $block->escapeHtml(__('Signing In')); ?>
+        </h4>
+    </div>
+    <div class="modal-body p-0 mt-2 mt-md-3">
+        <form class="terms-form" id="terms-form" method="post" action="<?= $block->escapeUrl($this->getUrl('organization/account/saveterms')) ?>">
+            <fieldset class="fieldset">
+                <div class="field">
+                    <?php if(!$terms['terms'] && $terms['subscription'] && $this->customerSession->getOrganization() != "Myself" && !$isPunchoutLogin) {?>
+                        <div class="control">
+                            <span class="label">
+                                Note that as a representative of <span class="font-500"><?= $block->escapeHtml($orgName) ?></span>, you are bound by 
+                                the <a aria-label="Terms and Conditions opens in new window" class="aui-red font-500" href="<?= $block->escapeUrl($termsUrl) ?>" target="_blank">Terms and Conditions</a>.
+                            </span>
+                        </div>
+                    <?php }?>
+                    <?php if ($terms['terms']): ?>
+                        <div class="control">
+                            <?php if($this->customerSession->getOrganization() == "Myself") { ?>
+                                <p>
+                                    Please accept the <a aria-label="Terms and Conditions opens in new window" class="aui-red aui-textdec-line" href="<?= $block->escapeUrl($termsUrl) ?>" target="_blank">Terms & Conditions</a>
+                                    and the <a aria-label="privacy policy opens in new window" class="aui-red aui-textdec-line" href="<?= $block->escapeUrl($policyUrl) ?>" target="_blank">Privacy Policy</a> to continue.
+                                </p>
+                            <?php } else { ?>
+                                <p>A new organization account has been created for <span class="font-500"><?= $block->escapeHtml($orgName) ?>.</span></p>
+                                <p>
+                                    Please accept the <a aria-label="Terms and Conditions opens in new window" class="aui-red aui-textdec-line" href="<?= $block->escapeUrl($termsUrl) ?>" target="_blank">Terms & Conditions</a> and the 
+                                    <a aria-label="privacy policy opens in new window" class="aui-red aui-textdec-line" href="<?= $block->escapeUrl($policyUrl) ?>" target="_blank">Privacy Policy</a> to use the site on behalf of 
+                                    <span class="font-500"><?= $block->escapeHtml($orgName) ?></span>
+                                </p>
+                            <?php } ?>
+                            <div class="field form-group form-radio">
+                                <input type="radio" name="terms" id="tnc1" value="1" class="custom-radio radio required-entry">
+                                <label class="label radio-inline" for="tnc1">
+                                    <?= /* @noEscape */ __('Yes - I accept the terms & conditions and privacy policy'); ?>
+                                </label>
+                            </div>
+                            <div class="field form-group form-radio">
+                                <input type="radio" name="terms" id="tnc0" value="0" class="custom-radio radio required-entry">
+                                <label class="label radio-inline" for="tnc0">
+                                    <?= /* @noEscape */ __('No - I do not accept the terms & conditions and privacy policy'); ?> 
+                                </label>
+                            </div>
+                            <div class="aui-red font14" style="display: none"><?= /* @noEscape */ __("This is a required field.") ?></div>
+                        </div> 
+                    <?php endif; ?>
+                    <?php if ($terms['subscription']): ?>
+                        <div <?= /* @noEscape */ ($terms['terms']) ? "style='display:none'" : '' ?> class="subs-pop field form-group form-check-bordered form-checkboxes mt-md-4 mt-3">
+                            <input type="checkbox" name="subscription" class="custom-checkbox checkbox" id="subs" checked="checked" value="1">
+                            <label class="label" for="subs">
+                                <?= $isPunchoutLogin ?
+                                    $block->escapeHtml(__('I would like to receive important emails about product updates and new offers')) :
+                                    $block->escapeHtml(__($communicationText)); ?>
+                            </label>
+                        </div> 
+                    <?php endif; ?>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+    <div data-role="loader" class="loading-mask">
+        <div class="loader">
+        <div class="aui-block-loader"></div>
+        </div>
+    </div>
+    <div class="modal-footer mt-0">
+        <a class="btn btn-primary btn-round w-smscpr-100" id="finelogout" href="<?= $block->escapeUrl($this->getUrl('customer/account/logout')); ?>" style="display: none">
+            <?= /* @noEscape */ __('Decline and Log Out'); ?>
+        </a>
+        <button type="button" class="btn btn-primary btn-round submit tncsubmit w-smscpr-100" id="finalsubmit" title="Submit" <?= ($terms['terms']) ? "disabled" : '' ?>>
+            <?= $isPunchoutLogin ? $block->escapeHtml(__('Proceed')): $block->escapeHtml(__('Accept and Continue')); ?>
+        </button> 
+        <span class="spinner-border spinner-border-sm position-absolute" id="termsAndcon" style="display:none"></span>
+    </div>
+</div>
+
+<script type="text/javascript">
+require([
+  'jquery',
+  'mage/mage'
+], function($){
+    var dataForm = $('#terms-form');
+    dataForm.mage('validation', {});
+    $("#finelogout").hide();
+    $(".block-terms-popup #finelogout").click(function(){
+    $('#termsAndcon').show();
+    });
+    $(".block-terms-popup #finalsubmit").click(function(){
+        $('#termsAndcon').show();
+        var status = dataForm.validation('isValid');
+        var data = {"event":"register","eccLocalId":"475934cf-83a8-49bd-984f-def90737a699","eccUserType":"student",
+            "siteName":"shopcpr"};
+         //sendGoogleTagEvent(data);
+        $(".terms-error").hide();
+        if(status){
+            $.ajax({
+                type : 'POST',
+                dataType: "json",
+                url : '<?= $block->escapeUrl($this->geturl("organization/account/saveterms"))?>',
+                cache: false,
+                data : jQuery('#terms-form').serialize(),
+                success: function(response){
+                    //window.location.reload();
+                    window.location.href = response.redirect_url;
+                }
+            });
+        } else {
+            $(".terms-error").show();
+        }
+    });
+    
+    $(".block-terms-popup .field input").click(function(){
+        $(".terms-error").hide();
+        $('button#finalsubmit').removeAttr("disabled");
+        if($(this).val() == 1){
+            $(".subs-pop").show();
+            $("#finelogout").hide();
+            $("#finalsubmit").show();
+        } else {
+            $("#finelogout").show();
+            $(".subs-pop").hide();
+            $("#finalsubmit").hide();
+        }
+    });
+    $(document).ready(function() {
+        setTimeout(function(){
+             $("#orgpopup .loading-mask").hide();
+        }, 6000);
+    });
+    
+});
+</script>

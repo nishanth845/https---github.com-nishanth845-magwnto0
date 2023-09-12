@@ -1,0 +1,204 @@
+<?php
+/**
+ * @category  AHA
+ * @package   Organization
+ * @author    alexander.rajan@laerdal.com
+ **/
+
+/** @var \Magento\Framework\Escaper $escaper */
+?>
+
+<?php
+/** @var $block \Aha\Organization\Block\Account\Address */
+$orgData = $block->getOrgData();
+$orgTempData = $this->customerSession->getOrgData();
+if(!isset($orgTempData['billing_to']) && $orgData){
+    $orgTempData['billing_to'] =  $orgData->getBillingTo();
+    $orgTempData['bill_dept'] =  $orgData->getBillingDept();
+    $this->customerSession->setOrgData($orgTempData);
+}
+
+$orgTempData['billing_email'] = "";
+if(isset($orgTempData['suborg']) && !$orgTempData['suborg'] &&  $orgData){
+    $orgTempData['billing_email'] =  $orgData->getBillingEmail();
+    $orgTempData['billing_email_cc'] =  $orgData->getBillingEmailCc();
+}
+
+?>
+<?php $_company = $block->getLayout()->createBlock(\Magento\Customer\Block\Widget\Company::class) ?>
+<?php $_telephone = $block->getLayout()->createBlock(\Magento\Customer\Block\Widget\Telephone::class) ?>
+<?php $_fax = $block->getLayout()->createBlock(\Magento\Customer\Block\Widget\Fax::class) ?>
+<div class="modal-content block-step-two">
+    <div class="modal-header m-0">
+        <h2 class="h4" id="organizationpopup-first-popup"><?= $escaper->escapeHtml(__("Organization Billing Details")) ?></h2>
+    </div>
+    <div class="modal-body p-0 mt-lg-2">
+        <form class="form-org-two mt-3"
+              method="post"
+              id="form-org-two"
+              enctype="multipart/form-data"
+              data-hasrequired="<?= $block->escapeHtmlAttr(__('* Required Fields')) ?>">
+            <input type="hidden" name="address_id" value="<?= $escaper->escapeHtml(($orgData) ? $orgData->getDefaultBilling() : '') ?>" />
+            <div class="form-group row">
+                <div class="col-sm-12 col-md-6">
+                    <label for="bill_to"><?= /* @noEscape */ __("Bill To") ?></label>
+                    <input type="text" class="form-control input-text validate-no-html-tags" autofocus id="bill_to" name="billing_to"
+                           value="<?= $escaper->escapeHtml((isset($orgTempData['billing_to'])) ? $orgTempData['billing_to'] : '') ?>" autocomplete="on"/>
+                </div>
+                <div class="col-sm-12 col-md-6 mt-3 mt-md-0">
+                    <label for="bill_dept"><?= /* @noEscape */ __("Department") ?></label>
+                    <input type="text" class="form-control input-text validate-no-html-tags" id="bill_dept" name="billing_dept" 
+                           value="<?= $escaper->escapeHtml((isset($orgTempData['billing_dept'])) ? $orgTempData['billing_dept'] : '') ?>" autocomplete="on"/>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-12 col-md-6 aui-required">
+                    <label for="bill_email"><?= /* @noEscape */ __("Billing Email Address") ?></label>
+                    <input type="text" class="form-control input-text validate-email required-entry" id="bill_email" name="billing_email"
+                           value="<?= $escaper->escapeHtml((isset($orgTempData['billing_email'])) ? $orgTempData['billing_email'] : '') ?>" autocomplete="on"/>
+                </div>
+                <div class="col-sm-12 col-md-6 mt-3 mt-md-0">
+                    <label for="billing_email_cc"><?= /* @noEscape */ __("Billing Email CC") ?></label>
+                    <input type="text" class="form-control input-text validate-email" id="billing_email_cc" name="billing_email_cc"
+                           value="<?= $escaper->escapeHtml((isset($orgTempData['billing_email_cc'])) ? $orgTempData['billing_email_cc'] : '') ?>" autocomplete="on"/>
+                </div>
+            </div>
+            <div class="form-group row">
+                <?php if ($_telephone->isEnabled()): ?>
+                    <?= $_telephone->setTelephone($block->getAddress()->getTelephone())->toHtml() ?>
+                <?php endif ?>
+                <!--<div class="col-sm-12 col-md-6 aui-required">
+                    <label for="inputFirstname"><?= __("Phone Number") ?></label>
+                    <input type="text" class="form-control" id="inputFirstname" />
+                </div> -->
+                <?php $_streetValidationClass = $this->helper(\Magento\Customer\Helper\Address::class)->getAttributeValidationClass('street'); ?>
+                <?php $_streetValidationClassNotRequired = trim((string)str_replace('required-entry', '', $_streetValidationClass)); ?>
+                <div class="col-sm-12 col-md-6 mt-3 mt-md-0 aui-required">
+                    <label for="street_1"><?= /* @noEscape */ __("Street Address") ?></label>
+                    <input type="text" id="street_1" name="street[]"
+                           class="form-control input-text <?= $block->escapeHtmlAttr($_streetValidationClass) ?> validate-po-box validate-no-html-tags"
+                           value="<?= $block->escapeHtmlAttr($block->getStreetLine(1)) ?>" autocomplete="on"/>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-12 col-md-6 field street2">
+                    <?php $label[2] = __('Apt, Suite, Others'); ?>
+                    <?php for ($_i = 1, $_n = $this->helper(\Magento\Customer\Helper\Address::class)->getStreetLines(); $_i < $_n; $_i++): ?>
+                        <label class="label" for="street_<?= /* @noEscape */ $_i + 1 ?>"><?= $block->escapeHtml(__($label[$_i + 1])) ?></label>
+                        <input autocomplete="on" type="text" name="street[<?= $_i ?>]"
+                                value="<?= $block->escapeHtmlAttr($block->getStreetLine($_i + 1)) ?>"
+                                aria-label="<?= $block->escapeHtmlAttr(__($label[$_i + 1])) ?>"
+                                id="street_<?= /* @noEscape */ $_i + 1 ?>"
+                                class="form-control input-text <?= $escaper->escapeHtmlAttr($_streetValidationClassNotRequired) ?> validate-po-box validate-no-html-tags">
+                    <?php endfor; ?>
+                </div>
+                <div class="col-sm-12 col-md-6 mt-3 mt-md-0 city aui-required">
+                    <label for="city"><?= /* @noEscape */ __("City") ?></label>
+                    <input autocomplete="on" type="text" id="city" name="city"
+                           class="form-control input-text required-entry validate-no-html-tags <?= $block->escapeHtmlAttr($this->helper(\Magento\Customer\Helper\Address::class)->getAttributeValidationClass('city')) ?>"
+                           value="<?= $block->escapeHtmlAttr($block->getAddress()->getCity()) ?>"/>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-12 col-md-6 region aui-required">
+                    <label for="region_id"><?= /* @noEscape */ __("State/Region") ?></label>
+                    <select id="region_id" name="region_id"
+                            aria-label="<?= /* @noEscape */ $block->escapeHtml(__('State / Region')) ?>"
+                            class="form-control validate-select" <?= /* @noEscape */ !$block->getConfig('general/region/display_all') ? ' disabled="disabled"' : '' ?>>
+                        <option value=""><?= $block->escapeHtml(__('Please select a region, state or province.')) ?></option>
+                    </select>
+                    <input autocomplete="on"
+                           type="text"
+                           id="region"
+                           name="region"
+                           value="<?= $block->escapeHtmlAttr($block->getRegion()) ?>"
+                           aria-label="<?= /* @noEscape */ $block->escapeHtml(__('State / Region')) ?>"
+                           class="form-control input-text validate-not-number-first <?= $block->escapeHtmlAttr($this->helper(\Magento\Customer\Helper\Address::class)->getAttributeValidationClass('region')) ?>"<?= !$block->getConfig('general/region/display_all') ? ' disabled="disabled"' : '' ?>/>
+                </div>
+                <div class="col-sm-12 col-md-6 mt-3 mt-md-0 aui-required">
+                    <label for="zip"><?= /* @noEscape */ __("Postal Code") ?></label>
+                    <input autocomplete="on" type="text" id="zip" name="postcode" 
+                           class="form-control input-text validate-zip-international validate-no-html-tags <?= $block->escapeHtmlAttr($this->helper(\Magento\Customer\Helper\Address::class)->getAttributeValidationClass('postcode')) ?>"
+                           value="<?= $block->escapeHtmlAttr($block->getAddress()->getPostcode()) ?>"/>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-sm-12 col-md-6 aui-required">
+                    <label for="country"><?= /* @noEscape */ __("Country") ?></label>
+                    <?= $block->getCountryHtmlSelect() ?>
+                </div>
+            </div>
+            <input type="hidden" name="default_billing" value="1" />
+            <input type="hidden" name="default_shipping" value="1" />
+        </form>
+    </div>
+    <div class="modal-footer mt-4 mb-3">
+        <div class="w-100">
+            <div class="d-flex tc-billing-detail float-sm-right">
+                <a role="button" aria-label="Back to the previous screen" href="javascript:void(0);" class="back btn btn-secondary btn-round mr-4"><?= /* @noEscape */ __("Back") ?></a>
+                <a role="button" aria-label="next to Proceed" href="javascript:void(0);" class="next btn btn-primary btn-round"><?= /* @noEscape */ __("Next") ?></a>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+function validStreet2(str)
+{
+    var regexp = /(?:P(?:ost(?:al)?)?[\.\-\s]*(?:(?:O(?:ffice)?[\.\-\s]*)?B(?:ox|in|\b|\d)|o(?:ffice|\b)(?:[-\s]*\d)|code)|box[-\s\b]*\d)/i;
+    if (regexp.test(str)) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+require([
+  'jquery',
+  'mage/mage',
+  'intlTelInput'
+], function($){
+    $(".block-step-two #country").addClass("form-control");
+    $("input[name='telephone']").intlTelInput(<?= /* @noEscape */ $block->getPhoneConfig(); ?>)
+
+    var dataForm = $('#form-org-two');
+    dataForm.mage('addressValidation', {});
+    $("#country").mage('regionUpdater', {
+        "optionalRegionAllowed": <?= /* @noEscape */ $block->getConfig('general/region/display_all') ? 'true' : 'false' ?>,
+        "regionListId": "#region_id",
+        "regionInputId": "#region",
+        "postcodeId": "#zip",
+        "form": "#form-validate",
+        "regionJson": <?= /* @noEscape */ $this->helper(\Magento\Directory\Helper\Data::class)->getRegionJson() ?>,
+        "defaultRegion": "<?= (int) $block->getRegionId() ?>",
+        "countriesWithOptionalZip": <?= /* @noEscape */ $this->helper(\Magento\Directory\Helper\Data::class)->getCountriesWithOptionalZip(true) ?>
+    });
+    $(".block-step-two .next").click(function(){
+        var status = dataForm.validation('isValid');
+        var street_2 = $("#street_2").val();
+        $('#cust_street_2-error').hide();
+        var hasStreet2Error = validStreet2(street_2);
+        if(hasStreet2Error){
+            $('#cust_street_2-error').show();
+        }
+        if(status && !hasStreet2Error){
+            $.ajax({
+                type : 'POST',
+                url : '<?= $block->escapeUrl($this->geturl("organization/popup/serialize"))?>',
+                data : jQuery('#form-org-two').serialize(),
+                cache: true,
+                success: function(response){
+                    steps(3);
+                }
+            });
+        }
+    });
+    
+    $(".block-step-two .back").click(function(){
+        back();
+    });
+    $(document).on('change', '#country', function() {
+        $('#region_id-error').hide();
+    })
+});
+</script>
+

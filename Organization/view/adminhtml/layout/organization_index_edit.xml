@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+ * Filename     : organization_index_edit.xml
+ * Developer    : Alexander
+ * Company      : AHA
+ * Module       : AHA_Organization
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="admin-2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <link src="Aha_Sales::js/bootstrap/order-invoice-list.js"/>
+        <css src="Aha_InternationalTelephoneInput::css/intlTelInput.css"/>
+        <link src="Aha_InternationalTelephoneInput::js/utils.js"/>
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block class="Aha\InternationalTelephoneInput\Block\PhoneNumber"
+                   ifconfig="internationaltelephoneinput/general/enabled"
+                   template="Aha_InternationalTelephoneInput::js-address.phtml"
+                   name="international.telephone.input.backend"/>
+
+            <uiComponent name="aha_organization_form"/>
+        </referenceContainer>
+    </body>
+</page>
